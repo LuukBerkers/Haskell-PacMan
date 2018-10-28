@@ -22,20 +22,20 @@ data Ghost = Ghost {
 
 defaultGhosts :: [Ghost]
 defaultGhosts = [
-    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Clyde Scatter,
+    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Blinky Scatter,
     Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Pinky Scatter
     -- Ghost (0, 0) North 1 Inky Scatter,
-    -- Ghost (0, 0) North 1 Blinky Scatter
+    -- Ghost (tileToPoint (13.5, 10)) North 1 Clyde Scatter
   ]
 
 instance GameObject Ghost where
   render sprite ghost = uncurry translate (pointToScreen $ position ghost) $ tilePosition sprite
     where
       tilePosition = case (direction ghost, behaviour ghost) of
-        (West,  Clyde)  -> rectangleTile (8,  11)
-        (East,  Clyde)  -> rectangleTile (9,  11)
-        (South, Clyde)  -> rectangleTile (10, 11)
-        (North, Clyde)  -> rectangleTile (11, 11)
+        (West,  Blinky)  -> rectangleTile (8,  11)
+        (East,  Blinky)  -> rectangleTile (9,  11)
+        (South, Blinky)  -> rectangleTile (10, 11)
+        (North, Blinky)  -> rectangleTile (11, 11)
         (West,  Pinky)  -> rectangleTile (4,  12)
         (East,  Pinky)  -> rectangleTile (5,  12)
         (South, Pinky)  -> rectangleTile (6,  12)
@@ -44,10 +44,10 @@ instance GameObject Ghost where
         (East,  Inky)   -> rectangleTile (1,  12)
         (South, Inky)   -> rectangleTile (2,  12)
         (North, Inky)   -> rectangleTile (3,  12)
-        (West,  Blinky) -> rectangleTile (8,  12)
-        (East,  Blinky) -> rectangleTile (9,  12)
-        (South, Blinky) -> rectangleTile (10, 12)
-        (North, Blinky) -> rectangleTile (11, 12)
+        (West,  Clyde) -> rectangleTile (8,  12)
+        (East,  Clyde) -> rectangleTile (9,  12)
+        (South, Clyde) -> rectangleTile (10, 12)
+        (North, Clyde) -> rectangleTile (11, 12)
 
   update transferObject dt ghost = ghost {
     position = position ghost =+=
@@ -97,8 +97,8 @@ instance GameObject Ghost where
 
       targetTile :: Vec2
       targetTile = case behaviour ghost of
-        Clyde -> pointToTile $ pacManPosition transferObject
-        Pinky -> pointToTile (pacManPosition transferObject) =+= getDirVec (pacManDirection transferObject) =*- 4
+        Blinky -> pointToTile $ pacManPosition transferObject
+        Pinky  -> pointToTile (pacManPosition transferObject) =+= getDirVec (pacManDirection transferObject) =*- 4
 
       constructedTiles :: [[Tile]]
       constructedTiles = constructTiles (tiles transferObject)

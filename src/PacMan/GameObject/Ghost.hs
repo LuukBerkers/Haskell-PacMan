@@ -83,7 +83,7 @@ instance GameObject Ghost where
 
       direction' :: Direction
       direction'
-        | maxMovement - movement <= 0 = case sortBy sort' $ filter (/= oppositeDirection (direction ghost)) $ mapMaybe isDirectionWall [North, East, South, West] of
+        | maxMovement - movement < 0 = case sortBy sort' $ filter (/= oppositeDirection (direction ghost)) $ mapMaybe isDirectionWall [North, East, South, West] of
           (direction : _) -> direction
           _               -> error "no possible direction found"
         | otherwise = direction ghost

@@ -1,10 +1,10 @@
-module Controller where
+module PacMan.Controller where
 
 import Graphics.Gloss.Interface.IO.Game
-import Model
-import GameObject
-import PacMan
-import Helper
+import PacMan.Model
+import PacMan.GameObject
+import PacMan.GameObject.PacMan
+import PacMan.Helper
 
 step :: Float -> GameState -> IO GameState
 step dt gameState = return gameState {

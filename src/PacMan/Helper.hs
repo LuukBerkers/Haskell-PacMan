@@ -1,4 +1,4 @@
-module Helper where
+module PacMan.Helper where
 
 import Codec.BMP
 import Graphics.Gloss.Data.Picture

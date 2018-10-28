@@ -1,9 +1,9 @@
-module GameObject where
+module PacMan.GameObject where
 
 import Graphics.Gloss.Interface.Pure.Game
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
-import Helper
+import PacMan.Helper
 
 class GameObject a where
   render :: String -> BitmapData -> a -> Picture

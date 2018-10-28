@@ -1,9 +1,9 @@
-module Ghost where
+module PacMan.GameObject.Ghost where
 
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
-import Helper
-import GameObject
+import PacMan.Helper
+import PacMan.GameObject
 import Data.Fixed (mod')
 import Data.Maybe
 import Data.List

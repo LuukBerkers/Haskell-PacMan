@@ -1,9 +1,9 @@
-module Model where
+module PacMan.Model where
 
-import Ghost
-import Grid
-import PacMan
-import Coin
+import PacMan.GameObject.Ghost
+import PacMan.GameObject.Grid
+import PacMan.GameObject.PacMan
+import PacMan.GameObject.Coin
 
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap

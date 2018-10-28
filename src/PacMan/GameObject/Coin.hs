@@ -1,9 +1,9 @@
-module Coin where
+module PacMan.GameObject.Coin where
 
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
-import Helper
-import GameObject
+import PacMan.Helper
+import PacMan.GameObject
 import Data.Maybe
 
 data CoinState = Eaten | Alive

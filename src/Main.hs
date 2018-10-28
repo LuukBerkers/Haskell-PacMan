@@ -1,9 +1,9 @@
 module Main where
 
-import Controller
-import Model
-import View
-import Helper
+import PacMan.Controller
+import PacMan.Model
+import PacMan.View
+import PacMan.Helper
 
 import Graphics.Gloss.Interface.IO.Game
 

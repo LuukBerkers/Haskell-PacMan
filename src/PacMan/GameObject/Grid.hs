@@ -1,7 +1,7 @@
-module Grid where
+module PacMan.GameObject.Grid where
 
-import GameObject
-import Helper
+import PacMan.GameObject
+import PacMan.Helper
 
 import Graphics.Gloss.Data.Bitmap
 import Graphics.Gloss.Data.Picture

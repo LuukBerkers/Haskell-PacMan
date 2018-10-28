@@ -1,10 +1,10 @@
-module PacMan where
+module PacMan.GameObject.PacMan where
 
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
 import Graphics.Gloss.Interface.IO.Game
-import GameObject
-import Helper
+import PacMan.GameObject
+import PacMan.Helper
 
 data PacMan = PacMan {
   elapsedPath :: Float,

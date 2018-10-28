@@ -1,9 +1,9 @@
-module View where
+module PacMan.View where
 
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
-import Model
-import GameObject
+import PacMan.Model
+import PacMan.GameObject
 
 view :: GameState -> IO Picture
 view gameState = return $ pictures (

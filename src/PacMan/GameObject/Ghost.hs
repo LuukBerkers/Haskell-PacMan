@@ -22,8 +22,8 @@ data Ghost = Ghost {
 
 defaultGhosts :: [Ghost]
 defaultGhosts = [
-    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Clyde Scatter
-    -- Ghost (0, 0) North 1 Pinky Scatter,
+    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Clyde Scatter,
+    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Pinky Scatter
     -- Ghost (0, 0) North 1 Inky Scatter,
     -- Ghost (0, 0) North 1 Blinky Scatter
   ]
@@ -93,7 +93,12 @@ instance GameObject Ghost where
             | otherwise = LT
 
           distanceToDirection :: Direction -> Float
-          distanceToDirection direction = lengthVec2 $ pointToTile (position ghost) =+= getDirVec direction =-= pointToTile (pacManPosition transferObject)
+          distanceToDirection direction = lengthVec2 $ pointToTile (position ghost) =+= getDirVec direction =-= targetTile
+
+      targetTile :: Vec2
+      targetTile = case behaviour ghost of
+        Clyde -> pointToTile $ pacManPosition transferObject
+        Pinky -> pointToTile (pacManPosition transferObject) =+= getDirVec (pacManDirection transferObject) =*- 4
 
       constructedTiles :: [[Tile]]
       constructedTiles = constructTiles (tiles transferObject)

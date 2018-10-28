@@ -20,13 +20,13 @@ data Ghost = Ghost {
   mode :: GhostMode
 }
 
-defaultGhosts :: [Ghost]
-defaultGhosts = [
-    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Blinky Scatter,
-    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Pinky Scatter
-    -- Ghost (0, 0) North 1 Inky Scatter,
-    -- Ghost (tileToPoint (13.5, 10)) North 1 Clyde Scatter
-  ]
+defaultGhosts :: (Ghost, Ghost, Ghost, Ghost)
+defaultGhosts = (
+    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky Scatter,
+    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Pinky  Scatter,
+    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Inky   Scatter,
+    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Clyde  Scatter
+  )
 
 instance GameObject Ghost where
   render sprite ghost = uncurry translate (pointToScreen $ position ghost) $ tilePosition sprite
@@ -99,6 +99,20 @@ instance GameObject Ghost where
       targetTile = case behaviour ghost of
         Blinky -> pointToTile $ pacManPosition transferObject
         Pinky  -> pointToTile (pacManPosition transferObject) =+= getDirVec (pacManDirection transferObject) =*- 4
+        Clyde   | lengthVec2 (pointToTile (position ghost =-= pacManPosition transferObject)) > 8
+               -> scatterModeTargetTile
+        Inky   -> pointToTile $ blinkyPosition transferObject =+= ((blinkyPosition transferObject =-= pacManPosition transferObject) =*- 2)
+        Clyde  -> pointToTile $ pacManPosition transferObject
+
+      scatterModeTargetTile :: Vec2
+      scatterModeTargetTile = case behaviour ghost of
+        Blinky -> (width, 0)
+        Pinky  -> (0, 0)
+        Inky   -> (width, height)
+        Clyde  -> (0, height)
+        where
+          width, height :: Float
+          (width, height) = fromIntegralVec2 (size constructedTiles)
 
       constructedTiles :: [[Tile]]
       constructedTiles = constructTiles (tiles transferObject)

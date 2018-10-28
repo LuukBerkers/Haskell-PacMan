@@ -7,5 +7,6 @@ data TransferObject = TransferObject {
   tiles :: String,
   sprite :: BitmapData,
   pacManDirection :: Direction,
-  pacManPosition :: Vec2
+  pacManPosition :: Vec2,
+  blinkyPosition :: Vec2
 }

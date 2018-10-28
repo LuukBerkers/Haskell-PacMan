@@ -4,14 +4,21 @@ import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
 import PacMan.Model
 import PacMan.GameObject
+import PacMan.GameObject.Ghost
 
 view :: GameState -> IO Picture
-view gameState = return $ pictures (
-    render' (grid gameState) :
+view gameState = return $ pictures $ render' (grid gameState) :
+  map render' (coins gameState) ++
+  (
     render' (pacMan gameState) :
-    map render' (coins gameState) ++
-    map render' (ghosts gameState)
+    render' blinky :
+    render' pinky :
+    render' inky :
+    [render' clyde]
   )
   where
     render' :: (GameObject a) => a -> Picture
     render' = render (sprite gameState)
+
+    blinky, pinky, inky, clyde :: Ghost
+    (blinky, pinky, inky, clyde) = ghosts gameState

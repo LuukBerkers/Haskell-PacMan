@@ -14,7 +14,7 @@ data GameState = GameState {
   lives :: Int,
   grid :: Grid,
   pacMan :: PacMan,
-  ghosts :: [Ghost],
+  ghosts :: (Ghost, Ghost, Ghost, Ghost),
   coins :: [Coin]
 }
 

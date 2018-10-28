@@ -9,7 +9,6 @@ import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
 
 data GameState = GameState {
-  tiles :: String,
   sprite :: BitmapData,
   elapsedTime :: Float,
   lives :: Int,
@@ -20,12 +19,11 @@ data GameState = GameState {
 }
 
 initialState :: String -> BitmapData -> GameState
-initialState tiles' sprite' = GameState
-  tiles'
+initialState tiles sprite' = GameState
   sprite'
   0
   3
-  defaultGrid
+  (defaultGrid tiles)
   defaultPacMan
   defaultGhosts
-  (defaultCoins tiles')
+  (defaultCoins tiles)

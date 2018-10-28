@@ -5,6 +5,7 @@ import Graphics.Gloss.Data.Bitmap
 import Graphics.Gloss.Interface.IO.Game
 import PacMan.GameObject
 import PacMan.Helper
+import PacMan.TransferObject
 
 data PacMan = PacMan {
   elapsedPath :: Float,
@@ -23,11 +24,11 @@ defaultPacMan = PacMan
   (8 * fromIntegral tileWidth)
 
 instance GameObject PacMan where
-  render _ sprite pacMan = uncurry translate (pointToScreen $ position pacMan) $ dirRectangleTile sprite
+  render sprite pacMan = uncurry translate (pointToScreen $ position pacMan) $ dirRectangleTile sprite
     where
       dirRectangleTile :: BitmapData -> Picture
       dirRectangleTile = rectangleTile $ animation !! (round (elapsedPath pacMan / 30) `mod` length animation)
-      
+
       animation :: [(Int, Int)]
       animation = case direction pacMan of
         North -> [(4, 7),  (5, 7),  (6, 7),  (7, 7),  (6, 7),  (5, 7)]
@@ -35,7 +36,7 @@ instance GameObject PacMan where
         South -> [(4, 8),  (5, 8),  (6, 8),  (7, 8),  (6, 8),  (5, 8)]
         West  -> [(4, 10), (5, 10), (6, 10), (7, 10), (6, 10), (5, 10)]
 
-  update tiles _ dt pacMan = pacMan {
+  update transferObject dt pacMan = pacMan {
     elapsedPath = elapsedPath pacMan + maxMovement,
     position = (position pacMan =+=
       (getDirVec (direction pacMan) =*- movementCurrentDirection) =+=
@@ -79,7 +80,7 @@ instance GameObject PacMan where
       canMove dir = gridElement constructedTiles (roundVec2 $ pointToTile (position pacMan) =+= getDirVec dir) `notElem` [Wall, GhostHouse]
 
       constructedTiles :: [[Tile]]
-      constructedTiles = constructTiles tiles
+      constructedTiles = constructTiles $ tiles transferObject
 
       gridSize :: Vec2
       gridSize = tileToPoint $ fromIntegralVec2 $ size constructedTiles

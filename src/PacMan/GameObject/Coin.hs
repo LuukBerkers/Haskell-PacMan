@@ -5,6 +5,7 @@ import Graphics.Gloss.Data.Bitmap
 import PacMan.Helper
 import PacMan.GameObject
 import Data.Maybe
+import PacMan.TransferObject
 
 data CoinState = Eaten | Alive
 data CoinType = Regular | PowerUp
@@ -28,7 +29,7 @@ defaultCoins tiles = mapMaybe convert $ zip coords $ concat $ constructTiles til
     convert _                    = Nothing
 
 instance GameObject Coin where
-  render _ sprite coin = case state coin of
+  render sprite coin = case state coin of
     Eaten -> Blank
     Alive -> uncurry translate (tileToScreen $ position coin) $ rectangleTile spritePosition sprite
     where
@@ -37,10 +38,10 @@ instance GameObject Coin where
         Regular -> (0, 13)
         PowerUp -> (7, 5)
 
-  update _ pacManPosition _ coin
+  update transferObject _ coin
     | collision = coin {
       state = Eaten
     }
     | otherwise = coin
     where
-      collision = roundVec2 (pointToTile pacManPosition) == roundVec2 (position coin)
+      collision = roundVec2 (pointToTile $ pacManPosition transferObject) == roundVec2 (position coin)

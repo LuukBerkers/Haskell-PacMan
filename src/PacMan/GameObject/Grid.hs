@@ -6,19 +6,21 @@ import PacMan.Helper
 import Graphics.Gloss.Data.Bitmap
 import Graphics.Gloss.Data.Picture
 
-data Grid = Grid
+data Grid = Grid {
+  tiles :: String
+}
 
-defaultGrid :: Grid
+defaultGrid :: String -> Grid
 defaultGrid = Grid
 
 instance GameObject Grid where
-  render tiles sprite grid = pictures $ zipWith (uncurry translate) coords connectWalls
+  render sprite grid = pictures $ zipWith (uncurry translate) coords connectWalls
     where
       coords :: [Vec2]
       coords = [tileToScreen $ fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
       connectWalls :: [Picture]
-      connectWalls = loopY $ pad $ constructTiles tiles
+      connectWalls = loopY $ pad $ constructTiles $ tiles grid
 
       loopY :: [[Tile]] -> [Picture]
       loopY ((_ : t) : c : bs@(_ : b) : ys) = loopX t c b ++ loopY (c : bs : ys)
@@ -51,4 +53,4 @@ instance GameObject Grid where
       pad tiles = addToStartAndEnd (replicate (width + 2) Empty) $ map (addToStartAndEnd Empty) tiles
 
       width, height :: Int
-      (width, height) = size $ lines tiles
+      (width, height) = size $ lines $ tiles grid

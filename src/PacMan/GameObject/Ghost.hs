@@ -4,6 +4,7 @@ import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
 import PacMan.Helper
 import PacMan.GameObject
+import PacMan.TransferObject
 import Data.Fixed (mod')
 import Data.Maybe
 import Data.List
@@ -28,7 +29,7 @@ defaultGhosts = [
   ]
 
 instance GameObject Ghost where
-  render _ sprite ghost = uncurry translate (pointToScreen $ position ghost) $ tilePosition sprite
+  render sprite ghost = uncurry translate (pointToScreen $ position ghost) $ tilePosition sprite
     where
       tilePosition = case (direction ghost, behaviour ghost) of
         (West,  Clyde)  -> rectangleTile (8,  11)
@@ -48,7 +49,7 @@ instance GameObject Ghost where
         (South, Blinky) -> rectangleTile (10, 10)
         (North, Blinky) -> rectangleTile (11, 10)
 
-  update tiles pacManPosition dt ghost = ghost {
+  update transferObject dt ghost = ghost {
     position = position ghost =+=
       (getDirVec (direction ghost) =*- movementCurrentDirection) =+=
       (getDirVec direction' =*- movementNextDirection),
@@ -92,10 +93,10 @@ instance GameObject Ghost where
             | otherwise = LT
 
           distanceToDirection :: Direction -> Float
-          distanceToDirection direction = lengthVec2 $ pointToTile (position ghost) =+= getDirVec direction =-= pointToTile pacManPosition
+          distanceToDirection direction = lengthVec2 $ pointToTile (position ghost) =+= getDirVec direction =-= pointToTile (pacManPosition transferObject)
 
       constructedTiles :: [[Tile]]
-      constructedTiles = constructTiles tiles
+      constructedTiles = constructTiles (tiles transferObject)
 
       nextCoord :: Direction -> (Int, Int)
       nextCoord direction = roundVec2 $ pointToTile (position ghost) =+= getDirVec direction

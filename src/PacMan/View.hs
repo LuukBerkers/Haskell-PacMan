@@ -14,4 +14,4 @@ view gameState = return $ pictures (
   )
   where
     render' :: (GameObject a) => a -> Picture
-    render' = render (tiles gameState) (sprite gameState)
+    render' = render (sprite gameState)

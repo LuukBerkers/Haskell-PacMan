@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 module PacMan.GameObject.PacMan where
 
 import Graphics.Gloss.Data.Picture
@@ -30,11 +31,13 @@ instance GameObject PacMan where
       dirRectangleTile = rectangleTile $ animation !! (round (elapsedPath pacMan / 30) `mod` length animation)
 
       animation :: [(Int, Int)]
-      animation = case direction pacMan of
-        North -> [(4, 7),  (5, 7),  (6, 7),  (7, 7),  (6, 7),  (5, 7)]
-        East  -> [(4, 9),  (5, 9),  (6, 9),  (7, 9),  (6, 9),  (5, 9)]
-        South -> [(4, 8),  (5, 8),  (6, 8),  (7, 8),  (6, 8),  (5, 8)]
-        West  -> [(4, 10), (5, 10), (6, 10), (7, 10), (6, 10), (5, 10)]
+      animation = map (, y) [4, 5, 6, 7, 6, 5]
+        where
+          y = case direction pacMan of
+            North -> 7
+            East  -> 9
+            South -> 8
+            West  -> 10
 
   update transferObject dt pacMan = pacMan {
     elapsedPath = elapsedPath pacMan + maxMovement,

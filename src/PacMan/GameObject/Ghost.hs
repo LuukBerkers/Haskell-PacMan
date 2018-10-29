@@ -22,10 +22,10 @@ data Ghost = Ghost {
 
 defaultGhosts :: (Ghost, Ghost, Ghost, Ghost)
 defaultGhosts = (
-    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky Scatter,
-    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Pinky  Scatter,
-    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Inky   Scatter,
-    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Clyde  Scatter
+    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky Chase,
+    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Pinky  Chase,
+    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Inky   Chase,
+    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Clyde  Chase
   )
 
 instance GameObject Ghost where

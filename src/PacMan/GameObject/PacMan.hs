@@ -86,13 +86,13 @@ instance GameObject PacMan where
       gridSize = tileToPoint $ fromIntegralVec2 $ size constructedTiles
 
   key _ keyPressed pacMan = case getDirection of
-    Just direction' -> pacMan {
-      nextDirection = direction',
-      direction = if oppositeDirection direction' == direction pacMan
-        then direction'
+    Nothing             -> pacMan
+    Just nextDirection' -> pacMan {
+      nextDirection = nextDirection',
+      direction = if oppositeDirection nextDirection' == direction pacMan
+        then nextDirection'
         else direction pacMan
     }
-    Nothing  -> pacMan
     where
       getDirection :: Maybe Direction
       getDirection = case keyPressed of

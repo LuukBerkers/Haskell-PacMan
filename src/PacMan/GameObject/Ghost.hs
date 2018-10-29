@@ -5,7 +5,7 @@ import Graphics.Gloss.Data.Bitmap
 import PacMan.Helper
 import PacMan.GameObject
 import PacMan.TransferObject
-import Data.Fixed (mod')
+import Data.Fixed
 import Data.Maybe
 import Data.List
 
@@ -32,10 +32,10 @@ instance GameObject Ghost where
   render sprite ghost = uncurry translate (pointToScreen $ position ghost) $ tilePosition sprite
     where
       tilePosition = case (direction ghost, behaviour ghost) of
-        (West,  Blinky)  -> rectangleTile (8,  11)
-        (East,  Blinky)  -> rectangleTile (9,  11)
-        (South, Blinky)  -> rectangleTile (10, 11)
-        (North, Blinky)  -> rectangleTile (11, 11)
+        (West,  Blinky) -> rectangleTile (8,  11)
+        (East,  Blinky) -> rectangleTile (9,  11)
+        (South, Blinky) -> rectangleTile (10, 11)
+        (North, Blinky) -> rectangleTile (11, 11)
         (West,  Pinky)  -> rectangleTile (4,  12)
         (East,  Pinky)  -> rectangleTile (5,  12)
         (South, Pinky)  -> rectangleTile (6,  12)
@@ -44,10 +44,10 @@ instance GameObject Ghost where
         (East,  Inky)   -> rectangleTile (1,  12)
         (South, Inky)   -> rectangleTile (2,  12)
         (North, Inky)   -> rectangleTile (3,  12)
-        (West,  Clyde) -> rectangleTile (8,  12)
-        (East,  Clyde) -> rectangleTile (9,  12)
-        (South, Clyde) -> rectangleTile (10, 12)
-        (North, Clyde) -> rectangleTile (11, 12)
+        (West,  Clyde)  -> rectangleTile (8,  12)
+        (East,  Clyde)  -> rectangleTile (9,  12)
+        (South, Clyde)  -> rectangleTile (10, 12)
+        (North, Clyde)  -> rectangleTile (11, 12)
 
   update transferObject dt ghost = ghost {
     position = position ghost =+=
@@ -96,13 +96,15 @@ instance GameObject Ghost where
           distanceToDirection direction = lengthVec2 $ pointToTile (position ghost) =+= getDirVec direction =-= targetTile
 
       targetTile :: Vec2
-      targetTile = case behaviour ghost of
-        Blinky -> pointToTile $ pacManPosition transferObject
-        Pinky  -> pointToTile (pacManPosition transferObject) =+= getDirVec (pacManDirection transferObject) =*- 4
-        Clyde   | lengthVec2 (pointToTile (position ghost =-= pacManPosition transferObject)) > 8
-               -> scatterModeTargetTile
-        Inky   -> pointToTile $ blinkyPosition transferObject =+= ((blinkyPosition transferObject =-= pacManPosition transferObject) =*- 2)
-        Clyde  -> pointToTile $ pacManPosition transferObject
+      targetTile = case mode ghost of
+        Scatter -> scatterModeTargetTile
+        Chase -> case behaviour ghost of
+          Blinky -> pointToTile $ pacManPosition transferObject
+          Pinky  -> pointToTile (pacManPosition transferObject) =+= getDirVec (pacManDirection transferObject) =*- 4
+          Clyde   | lengthVec2 (pointToTile (position ghost =-= pacManPosition transferObject)) > 8
+                 -> scatterModeTargetTile
+          Inky   -> pointToTile $ blinkyPosition transferObject =+= ((blinkyPosition transferObject =-= pacManPosition transferObject) =*- 2)
+          Clyde  -> pointToTile $ pacManPosition transferObject
 
       scatterModeTargetTile :: Vec2
       scatterModeTargetTile = case behaviour ghost of

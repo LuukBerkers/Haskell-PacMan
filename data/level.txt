@@ -6,21 +6,21 @@
 #oooooooooooooooooooooooooo#
 #o####o##o########o##o####o#
 #oooooo##oooo##oooo##oooooo#
-######o#####o##o#####o######
-     #o#####o##o#####o#     
-     #o##oooooooooo##o#     
-     #o##o###__###o##o#     
-######o##o#______#o##o######
-     xoooo#______#oooox     
-######o##o#______#o##o######
-     #o##o########o##o#     
-     #o##oooooooooo##o#     
-     #o##o########o##o#     
-######o##o########o##o######
+######o##### ## #####o######
+     #o##### ## #####o#     
+     #o##          ##o#     
+     #o## ###__### ##o#     
+######o## #______# ##o######
+     xo   #______#   ox     
+######o## #______# ##o######
+     #o## ######## ##o#     
+     #o##          ##o#     
+     #o## ######## ##o#     
+######o## ######## ##o######
 #oooooooooooo##oooooooooooo#
 #o####o#####o##o#####o####o#
 #o####o#####o##o#####o####o#
-#Ooo##oooooooooooooooo##ooO#
+#Ooo##ooooooo  ooooooo##ooO#
 ###o##o##o########o##o##o###
 ###o##o##o########o##o##o###
 #oooooo##oooo##oooo##oooooo#

@@ -1,7 +1,7 @@
 module PacMan.View where
 
 import Graphics.Gloss.Data.Picture
-import Graphics.Gloss.Data.Bitmap
+
 import PacMan.Model
 import PacMan.GameObject
 import PacMan.GameObject.Ghost

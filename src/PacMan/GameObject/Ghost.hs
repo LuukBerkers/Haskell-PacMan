@@ -1,11 +1,10 @@
 module PacMan.GameObject.Ghost where
 
 import Graphics.Gloss.Data.Picture
-import Graphics.Gloss.Data.Bitmap
+
 import PacMan.Helper
 import PacMan.GameObject
 import PacMan.TransferObject
-import Data.Fixed
 import Data.Maybe
 import Data.List
 
@@ -23,9 +22,9 @@ data Ghost = Ghost {
 defaultGhosts :: (Ghost, Ghost, Ghost, Ghost)
 defaultGhosts = (
     Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky Chase,
-    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Pinky  Chase,
-    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Inky   Chase,
-    Ghost (tileToPoint (13.5, 10)) North (7 * fromIntegral tileWidth) Clyde  Chase
+    Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  Chase,
+    Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   Chase,
+    Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  Chase
   )
 
 instance GameObject Ghost where
@@ -50,6 +49,7 @@ instance GameObject Ghost where
         (North, Clyde)  -> rectangleTile (11, 12)
 
   update transferObject dt ghost = ghost {
+  -- position = position ghost
     position = position ghost =+=
       (getDirVec (direction ghost) =*- movementCurrentDirection) =+=
       (getDirVec direction' =*- movementNextDirection),
@@ -96,15 +96,17 @@ instance GameObject Ghost where
           distanceToDirection direction = lengthVec2 $ pointToTile (position ghost) =+= getDirVec direction =-= targetTile
 
       targetTile :: Vec2
-      targetTile = case mode ghost of
-        Scatter -> scatterModeTargetTile
-        Chase -> case behaviour ghost of
-          Blinky -> pointToTile $ pacManPosition transferObject
-          Pinky  -> pointToTile (pacManPosition transferObject) =+= getDirVec (pacManDirection transferObject) =*- 4
-          Clyde   | lengthVec2 (pointToTile (position ghost =-= pacManPosition transferObject)) > 8
-                 -> scatterModeTargetTile
-          Inky   -> pointToTile $ blinkyPosition transferObject =+= ((blinkyPosition transferObject =-= pacManPosition transferObject) =*- 2)
-          Clyde  -> pointToTile $ pacManPosition transferObject
+      targetTile
+        | getGrid (position ghost) == GhostHouse = (13.5, 10)
+        | otherwise = case mode ghost of
+          Scatter -> scatterModeTargetTile
+          Chase -> case behaviour ghost of
+            Blinky -> pointToTile $ pacManPosition transferObject
+            Pinky  -> pointToTile (pacManPosition transferObject) =+= getDirVec (pacManDirection transferObject) =*- 4
+            Clyde   | lengthVec2 (pointToTile (position ghost =-= pacManPosition transferObject)) > 8
+                   -> scatterModeTargetTile
+            Clyde  -> pointToTile $ pacManPosition transferObject
+            Inky   -> pointToTile $ blinkyPosition transferObject =+= ((blinkyPosition transferObject =-= pacManPosition transferObject) =*- 2)
 
       scatterModeTargetTile :: Vec2
       scatterModeTargetTile = case behaviour ghost of
@@ -119,10 +121,15 @@ instance GameObject Ghost where
       constructedTiles :: [[Tile]]
       constructedTiles = constructTiles (tiles transferObject)
 
-      nextCoord :: Direction -> (Int, Int)
-      nextCoord direction = roundVec2 $ pointToTile (position ghost) =+= getDirVec direction
+      getGrid :: Vec2 -> Tile
+      getGrid position = gridElement constructedTiles (roundVec2 $ pointToTile position)
 
       isDirectionWall :: Direction -> Maybe Direction
       isDirectionWall direction
-        | gridElement constructedTiles (nextCoord direction) `elem` [Wall, GhostWall, GhostHouse] = Nothing
+        | getGrid (position ghost =+= tileToPoint (getDirVec direction)) `elem` wallObjects = Nothing
         | otherwise = Just direction
+
+      wallObjects :: [Tile]
+      wallObjects 
+        | getGrid (position ghost) == GhostHouse = [Wall, GhostWall]
+        | otherwise = [Wall, GhostWall, GhostHouse]

@@ -1,7 +1,6 @@
 module PacMan.Controller where
 
 import Graphics.Gloss.Interface.IO.Game
-import PacMan.Helper
 import PacMan.GameObject.Ghost as Ghost
 import PacMan.Model as Model
 import PacMan.GameObject as GameObject

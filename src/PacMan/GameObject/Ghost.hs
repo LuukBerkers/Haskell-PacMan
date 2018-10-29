@@ -29,7 +29,7 @@ defaultGhosts = (
   )
 
 instance GameObject Ghost where
-  render sprite ghost = uncurry translate (pointToScreen $ position ghost) $ tilePosition sprite
+  render sprite _ ghost = uncurry translate (pointToScreen $ position ghost) $ tilePosition sprite
     where
       tilePosition = case (direction ghost, behaviour ghost) of
         (West,  Blinky) -> rectangleTile (8,  11)

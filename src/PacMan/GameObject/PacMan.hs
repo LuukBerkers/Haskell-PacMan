@@ -24,7 +24,7 @@ defaultPacMan = PacMan
   (8 * fromIntegral tileWidth)
 
 instance GameObject PacMan where
-  render sprite pacMan = uncurry translate (pointToScreen $ position pacMan) $ dirRectangleTile sprite
+  render sprite _ pacMan = uncurry translate (pointToScreen $ position pacMan) $ dirRectangleTile sprite
     where
       dirRectangleTile :: BitmapData -> Picture
       dirRectangleTile = rectangleTile $ animation !! (round (elapsedPath pacMan / 30) `mod` length animation)

@@ -7,8 +7,8 @@ import PacMan.Helper
 import PacMan.TransferObject
 
 class GameObject a where
-  render :: BitmapData -> a -> Picture
-  render _ _ = Blank
+  render :: BitmapData -> Float -> a -> Picture
+  render _ _ _ = Blank
 
   update :: TransferObject -> Float -> a -> a
   update _ _ a = a

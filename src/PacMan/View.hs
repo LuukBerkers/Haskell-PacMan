@@ -18,7 +18,7 @@ view gameState = return $ pictures $ render' (grid gameState) :
   )
   where
     render' :: (GameObject a) => a -> Picture
-    render' = render (sprite gameState)
+    render' = render (sprite gameState) (elapsedTime gameState)
 
     blinky, pinky, inky, clyde :: Ghost
     (blinky, pinky, inky, clyde) = ghosts gameState

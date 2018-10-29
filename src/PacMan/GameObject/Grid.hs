@@ -14,7 +14,7 @@ defaultGrid :: String -> Grid
 defaultGrid = Grid
 
 instance GameObject Grid where
-  render sprite grid = pictures $ zipWith (uncurry translate) coords connectWalls
+  render sprite _ grid = pictures $ zipWith (uncurry translate) coords connectWalls
     where
       coords :: [Vec2]
       coords = [tileToScreen $ fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]

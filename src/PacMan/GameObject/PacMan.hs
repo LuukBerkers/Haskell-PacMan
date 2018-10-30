@@ -9,10 +9,10 @@ import PacMan.Model hiding (pacMan)
 import PacMan.Helper
 
 render :: BitmapData -> GameState GameObject -> GameObject -> Picture
-render sprite _ pacMan = uncurry translate (pointToScreen $ positionPacMan pacMan) $ dirRectangleTile sprite
+render sprite _ pacMan = uncurry translate (pointToScreen $ positionPacMan pacMan) $ dirRectangleCell sprite
   where
-    dirRectangleTile :: BitmapData -> Picture
-    dirRectangleTile = rectangleTile $ animation !! (round (elapsedPath pacMan / 30) `mod` length animation)
+    dirRectangleCell :: BitmapData -> Picture
+    dirRectangleCell = rectangleCell $ animation !! (round (elapsedPath pacMan / 30) `mod` length animation)
 
     animation :: [(Int, Int)]
     animation = map (, y) [4, 5, 6, 7, 6, 5]
@@ -65,13 +65,13 @@ update gameState dt pacMan = pacMan {
       | otherwise = directionPacMan pacMan
 
     canMove :: Direction -> Bool
-    canMove dir = gridElement constructedTiles (roundVec2 $ pointToTile (positionPacMan pacMan) =+= getDirVec dir) `notElem` [Wall, GhostHouse]
+    canMove dir = gridElement constructedCells (roundVec2 $ pointToCell (positionPacMan pacMan) =+= getDirVec dir) `notElem` [Wall, GhostHouse]
 
-    constructedTiles :: [[Tile]]
-    constructedTiles = constructTiles $ tilesGrid $ grid gameState
+    constructedCells :: [[Cell]]
+    constructedCells = constructCells $ tilesGrid $ grid gameState
 
     gridSize :: Vec2
-    gridSize = tileToPoint $ fromIntegralVec2 $ size constructedTiles
+    gridSize = tileToPoint $ fromIntegralVec2 $ size constructedCells
 
 keyDown :: GameState GameObject -> SpecialKey -> GameObject -> GameObject
 keyDown _ key pacMan = case getDirection of

@@ -10,7 +10,7 @@ import PacMan.Helper
 
 render :: BitmapData -> GameState GameObject -> GameObject -> Picture
 render _ _ Coin { stateCoin = Eaten } = Blank
-render sprite gameState coin = uncurry translate (tileToScreen $ positionCoin coin) $ rectangleTile spritePosition sprite
+render sprite gameState coin = uncurry translate (tileToScreen $ positionCoin coin) $ rectangleCell spritePosition sprite
   where
     spritePosition :: (Int, Int)
     spritePosition = animation !! (round (elapsedTime gameState * 5) `mod` length animation)
@@ -26,7 +26,7 @@ update gameState _ coin
   | collision = coin { stateCoin = Eaten }
   | otherwise = coin
   where
-    collision = roundVec2 (pointToTile $ positionPacMan $ pacMan gameState) == roundVec2 (positionCoin coin)
+    collision = roundVec2 (pointToCell $ positionPacMan $ pacMan gameState) == roundVec2 (positionCoin coin)
 
 keyDown :: GameState GameObject -> SpecialKey -> GameObject -> GameObject
 keyDown _ _ a = a

@@ -63,13 +63,13 @@ initialState tiles' = GameState
     Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   Chase,
     Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  Chase
   )
-  (mapMaybe convert $ zip coords $ concat $ constructTiles tiles')
+  (mapMaybe convert $ zip coords $ concat $ constructCells tiles')
     where
       coords :: [Vec2]
-      coords = case size $ constructTiles tiles' of
+      coords = case size $ constructCells tiles' of
         (width, height) -> [fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
-      convert :: (Vec2, Tile) -> Maybe GameObject
-      convert (coord, CoinTile)    = Just $ Coin Alive Regular coord
-      convert (coord, PowerUpTile) = Just $ Coin Alive PowerUp coord
+      convert :: (Vec2, Cell) -> Maybe GameObject
+      convert (coord, CoinCell)    = Just $ Coin Alive Regular coord
+      convert (coord, PowerUpCell) = Just $ Coin Alive PowerUp coord
       convert _                    = Nothing

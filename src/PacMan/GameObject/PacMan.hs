@@ -72,13 +72,15 @@ update gameState dt pacMan = pacMan {
     gridSize = tileToPoint $ fromIntegralVec2 $ size constructedTiles
 
 keyDown _ key pacMan = case getDirection of
-  Nothing             -> pacMan
-  Just nextDirection' -> pacMan {
-    nextDirectionPacMan = nextDirection',
-    directionPacMan = if oppositeDirection nextDirection' == directionPacMan pacMan
-      then nextDirection'
-      else directionPacMan pacMan
+  -- Pac-Man can always move backwards
+  Just nextDirection | oppositeDirection nextDirection == directionPacMan pacMan -> pacMan {
+    nextDirectionPacMan = nextDirection,
+    directionPacMan = nextDirection
   }
+  Just nextDirection -> pacMan {
+    nextDirectionPacMan = nextDirection
+  }
+  Nothing -> pacMan
   where
     getDirection :: Maybe Direction
     getDirection = case key of

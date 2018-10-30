@@ -5,10 +5,11 @@ module PacMan.GameObject.PacMan where
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
 import Graphics.Gloss.Interface.IO.Game
-import PacMan.Model
+import PacMan.Model hiding (pacMan)
 import PacMan.Helper
 
-render sprite _ pacMan@PacMan {} = uncurry translate (pointToScreen $ positionPacMan pacMan) $ dirRectangleTile sprite
+render :: BitmapData -> GameState GameObject -> GameObject -> Picture
+render sprite _ pacMan = uncurry translate (pointToScreen $ positionPacMan pacMan) $ dirRectangleTile sprite
   where
     dirRectangleTile :: BitmapData -> Picture
     dirRectangleTile = rectangleTile $ animation !! (round (elapsedPath pacMan / 30) `mod` length animation)
@@ -22,6 +23,7 @@ render sprite _ pacMan@PacMan {} = uncurry translate (pointToScreen $ positionPa
           South -> 8
           West  -> 10
 
+update :: GameState GameObject -> Float -> GameObject -> GameObject
 update gameState dt pacMan = pacMan {
   elapsedPath = elapsedPath pacMan + maxMovement,
   positionPacMan = (positionPacMan pacMan =+=
@@ -71,6 +73,7 @@ update gameState dt pacMan = pacMan {
     gridSize :: Vec2
     gridSize = tileToPoint $ fromIntegralVec2 $ size constructedTiles
 
+keyDown :: GameState GameObject -> SpecialKey -> GameObject -> GameObject
 keyDown _ key pacMan = case getDirection of
   -- Pac-Man can always move backwards
   Just nextDirection | oppositeDirection nextDirection == directionPacMan pacMan -> pacMan {
@@ -89,5 +92,3 @@ keyDown _ key pacMan = case getDirection of
       KeyDown  -> Just South
       KeyLeft  -> Just West
       _        -> Nothing
-
-keyDown _ _ a = a

@@ -11,21 +11,21 @@ import qualified PacMan.GameObject.PacMan as PacMan
 
 step :: Updatable a => Float -> GameState a -> IO (GameState a)
 -- if gameState = Playing update every GameObject
-step dt gameState'@GameState { gameState = Playing, elapsedTime } = return $ fmap (update gameState' dt) gameState' {
+step dt gameState@GameState { gameMode = Playing, elapsedTime } = return $ fmap (update gameState dt) gameState {
   -- increase elapsedTime
   elapsedTime = elapsedTime + dt
 }
-step _ gameState' = return gameState'
+step _ gameState = return gameState
 
 input :: Updatable a => Event -> GameState a -> IO (GameState a)
 -- play pause logic
-input (EventKey (SpecialKey KeyEsc) Down _ _) gameState'@GameState { gameState = Playing } = return gameState' { gameState = Paused }
-input (EventKey (SpecialKey KeyEsc) Down _ _) gameState'@GameState { gameState = Paused } = return gameState' { gameState = Playing }
+input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@GameState { gameMode = Playing } = return gameState { gameMode = Paused }
+input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@GameState { gameMode = Paused } = return gameState { gameMode = Playing }
 
 -- emit special keys to all game objects
-input (EventKey (SpecialKey key) Down _ _) gameState' = return $ fmap (keyDown gameState' key) gameState'
+input (EventKey (SpecialKey key) Down _ _) gameState = return $ fmap (keyDown gameState key) gameState
 
-input _ gameState' = return gameState'
+input _ gameState = return gameState
 
 -- class Updatable that implements update and keyDown
 class Updatable a where

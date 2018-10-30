@@ -80,7 +80,7 @@ roundVec2 :: Vec2 -> (Int, Int)
 roundVec2 (x, y) = (round x, round y)
 
 lengthVec2 :: Vec2 -> Float
-lengthVec2 (x, y) = sqrt (x ^ 2 + y ^ 2)
+lengthVec2 (x, y) = sqrt (x ** 2 + y ** 2)
 
 size :: [[a]] -> (Int, Int)
 size y@(x : _) = (fromIntegral $ length x, fromIntegral $ length y)
@@ -108,7 +108,7 @@ rectangleTile (x, y) = bitmapSection $ Rectangle (1 + x * (tileWidth + 1), 1 + y
 
 gridElement :: [[Tile]] -> (Int, Int) -> Tile
 gridElement ((h : _ ) : _)  (0, 0) = h
-gridElement ((h : hs) : _)  (x, 0) = gridElement [hs] (x - 1, 0)
+gridElement ((_ : hs) : _)  (x, 0) = gridElement [hs] (x - 1, 0)
 gridElement (_        : vs) (x, y) = gridElement vs (x, y - 1)
 gridElement _               _      = Empty
 

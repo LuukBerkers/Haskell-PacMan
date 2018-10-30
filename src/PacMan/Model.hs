@@ -7,7 +7,7 @@ import PacMan.Helper
 data State = Playing | Paused
 
 data GameState a = GameState {
-  gameState :: State,
+  gameMode :: State,
   elapsedTime :: Float,
   lives :: Int,
   grid :: a,

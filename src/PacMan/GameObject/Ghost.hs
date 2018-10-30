@@ -2,10 +2,13 @@ module PacMan.GameObject.Ghost where
 
 import Data.Maybe
 import Data.List
+import Graphics.Gloss.Data.Picture
+import Graphics.Gloss.Data.Bitmap
+import Graphics.Gloss.Interface.IO.Game
 import PacMan.Model
 import PacMan.Helper
-import Graphics.Gloss.Data.Picture
 
+render :: BitmapData -> GameState GameObject -> GameObject -> Picture
 render sprite _ ghost = uncurry translate (pointToScreen $ positionGhost ghost) $ tilePosition sprite
   where
     tilePosition = case (directionGhost ghost, behaviourGhost ghost) of
@@ -26,6 +29,7 @@ render sprite _ ghost = uncurry translate (pointToScreen $ positionGhost ghost) 
       (South, Clyde)  -> rectangleTile (10, 12)
       (North, Clyde)  -> rectangleTile (11, 12)
 
+update :: GameState GameObject -> Float -> GameObject -> GameObject
 update gameState dt ghost = ghost {
   positionGhost = positionGhost ghost =+=
     (getDirVec (directionGhost ghost) =*- movementCurrentDirection) =+=
@@ -96,6 +100,7 @@ update gameState dt ghost = ghost {
 
           -- Inky tries to be to the otherside of Pac-Man compared to Blinky
           Inky   -> pointToTile $ blinkyPosition =+= ((blinkyPosition =-= positionPacMan (pacMan gameState)) =*- 2)
+        Frighten -> undefined
 
     blinkyPosition :: Vec2
     blinkyPosition = case ghosts gameState of (blinky, _, _, _) -> positionGhost blinky
@@ -126,4 +131,5 @@ update gameState dt ghost = ghost {
       | getGrid (positionGhost ghost) == GhostHouse = [Wall, GhostWall]
       | otherwise = [Wall, GhostWall, GhostHouse]
 
+keyDown :: GameState GameObject -> SpecialKey -> GameObject -> GameObject
 keyDown _ _ a = a

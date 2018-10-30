@@ -11,7 +11,7 @@ tileHeight = 20
 fps = 60
 
 data Direction = North | East | South | West deriving (Show, Eq)
-data Tile = Wall | CoinTile | PowerUpTile | Empty | GhostWall | GhostHouse deriving (Show, Eq)
+data Cell = Wall | CoinCell | PowerUpCell | Empty | GhostHouse deriving (Show, Eq)
 
 type Vec2 = (Float, Float)
 
@@ -70,8 +70,8 @@ tileToScreen = pointToScreen . tileToPoint
 tileToPoint :: Vec2 -> Vec2
 tileToPoint coord = (fromIntegral tileWidth, fromIntegral tileHeight) =*= coord
 
-pointToTile :: Vec2 -> Vec2
-pointToTile coord = coord =/= (fromIntegral tileWidth, fromIntegral tileHeight)
+pointToCell :: Vec2 -> Vec2
+pointToCell coord = coord =/= (fromIntegral tileWidth, fromIntegral tileHeight)
 
 fromIntegralVec2 :: (Int, Int) -> Vec2
 fromIntegralVec2 (x, y) = (fromIntegral x, fromIntegral y)
@@ -86,15 +86,15 @@ size :: [[a]] -> (Int, Int)
 size y@(x : _) = (fromIntegral $ length x, fromIntegral $ length y)
 size _ = (0, 0)
 
-constructTiles :: String -> [[Tile]]
-constructTiles = map (map replace) . lines
+constructCells :: String -> [[Cell]]
+constructCells = map (map replace) . lines
   where
-    replace :: Char -> Tile
-    replace 'o' = CoinTile
-    replace 'O' = PowerUpTile
+    replace :: Char -> Cell
+    replace 'o' = CoinCell
+    replace 'O' = PowerUpCell
     replace '#' = Wall
-    replace 'x' = GhostWall
     replace '_' = GhostHouse
+    replace ' ' = Empty
     replace _   = Empty -- unknown
 
 oppositeDirection :: Direction -> Direction
@@ -103,10 +103,10 @@ oppositeDirection East  = West
 oppositeDirection South = North
 oppositeDirection West  = East
 
-rectangleTile :: (Int, Int) -> BitmapData -> Picture
-rectangleTile (x, y) = bitmapSection $ Rectangle (1 + x * (tileWidth + 1), 1 + y * (tileHeight + 1)) (tileWidth, tileHeight)
+rectangleCell :: (Int, Int) -> BitmapData -> Picture
+rectangleCell (x, y) = bitmapSection $ Rectangle (1 + x * (tileWidth + 1), 1 + y * (tileHeight + 1)) (tileWidth, tileHeight)
 
-gridElement :: [[Tile]] -> (Int, Int) -> Tile
+gridElement :: [[Cell]] -> (Int, Int) -> Cell
 gridElement ((h : _ ) : _)  (0, 0) = h
 gridElement ((_ : hs) : _)  (x, 0) = gridElement [hs] (x - 1, 0)
 gridElement (_        : vs) (x, y) = gridElement vs (x, y - 1)

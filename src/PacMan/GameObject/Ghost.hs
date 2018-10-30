@@ -31,9 +31,9 @@ render sprite _ ghost = uncurry translate (pointToScreen $ positionGhost ghost) 
 
 update :: GameState GameObject -> Float -> GameObject -> GameObject
 update gameState dt ghost = ghost {
-  positionGhost = positionGhost ghost =+=
+  positionGhost = (positionGhost ghost =+=
     (getDirVec (directionGhost ghost) =*- movementCurrentDirection) =+=
-    (getDirVec direction' =*- movementNextDirection),
+    (getDirVec direction' =*- movementNextDirection) =+= gridSize) =%= gridSize,
   directionGhost = direction'
 }
   where
@@ -128,8 +128,11 @@ update gameState dt ghost = ghost {
 
     wallObjects :: [Tile]
     wallObjects
-      | getGrid (positionGhost ghost) == GhostHouse = [Wall, GhostWall]
-      | otherwise = [Wall, GhostWall, GhostHouse]
+      | getGrid (positionGhost ghost) == GhostHouse = [Wall]
+      | otherwise = [Wall, GhostHouse]
+
+    gridSize :: Vec2
+    gridSize = tileToPoint $ fromIntegralVec2 $ size constructedTiles
 
 keyDown :: GameState GameObject -> SpecialKey -> GameObject -> GameObject
 keyDown _ _ a = a

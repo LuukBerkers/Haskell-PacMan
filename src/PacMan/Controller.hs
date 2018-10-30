@@ -10,20 +10,28 @@ import qualified PacMan.GameObject.Ghost  as Ghost
 import qualified PacMan.GameObject.PacMan as PacMan
 
 step :: Float -> GameState GameObject -> IO (GameState GameObject)
+-- if gameState = Playing update every GameObject
 step dt gameState'@GameState { gameState = Playing, elapsedTime } = return $ fmap (update gameState' dt) gameState' {
+  -- increase elapsedTime
   elapsedTime = elapsedTime + dt
 }
 step _ gameState' = return gameState'
 
 input :: Event -> GameState GameObject -> IO (GameState GameObject)
+-- play pause logic
 input (EventKey (SpecialKey KeyEsc) Down _ _) gameState'@GameState { gameState = Playing } = return gameState' { gameState = Paused }
 input (EventKey (SpecialKey KeyEsc) Down _ _) gameState'@GameState { gameState = Paused } = return gameState' { gameState = Playing }
+
+-- emit special keys to all game objects
 input (EventKey (SpecialKey key) Down _ _) gameState' = return $ fmap (keyDown gameState' key) gameState'
 
 input _ gameState' = return gameState'
 
+-- class Updatable that implements update and keyDown
 class Updatable a where
+  -- update is called every frame, with the gamestate, delta time and the gameobject
   update :: GameState a -> Float -> a -> a
+  -- update is called with every special key down
   keyDown :: GameState a -> SpecialKey -> a -> a
 
 instance Updatable GameObject where

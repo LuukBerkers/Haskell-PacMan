@@ -1,9 +1,10 @@
 module PacMan.Helper where
 
+import Data.Fixed
+
 import Codec.BMP
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
-import Data.Fixed (mod')
 
 tileWidth, tileHeight, fps :: Int
 tileWidth = 20
@@ -112,6 +113,7 @@ gridElement ((h : hs) : _)  (x, 0) = gridElement [hs] (x - 1, 0)
 gridElement (_        : vs) (x, y) = gridElement vs (x, y - 1)
 gridElement _               _      = Empty
 
+-- made my loadfunction because I want to use BitmapData instead of Picture
 loadBitmapData :: FilePath -> IO BitmapData
 loadBitmapData filePath = do
   ebmp <- readBMP filePath

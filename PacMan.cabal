@@ -18,7 +18,7 @@ cabal-version:       >=1.10
 executable PacMan
   main-is:             Main.hs
   -- other-extensions:
-  other-modules:       PacMan.TransferObject, PacMan.GameObject.Coin, PacMan.Controller, PacMan.GameObject, PacMan.GameObject.Ghost, PacMan.GameObject.Grid, PacMan.Helper, PacMan.Model, PacMan.GameObject.PacMan, PacMan.View
+  other-modules:       PacMan.Controller, PacMan.Helper, PacMan.Model, PacMan.View
   build-depends:       base >=4.11 && <4.12, gloss, bmp, strict, random
   hs-source-dirs:      src
   default-language:    Haskell2010

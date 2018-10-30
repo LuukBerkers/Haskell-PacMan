@@ -1,3 +1,5 @@
+{-# LANGUAGE NamedFieldPuns #-}
+
 module PacMan.Model where
   
 import Data.Maybe
@@ -19,14 +21,12 @@ data GameState a = GameState {
 }
 
 instance Functor GameState where
-  fmap f gameState = gameState {
-    pacMan = f $ pacMan gameState,
-    grid = f $ grid gameState,
-    coins = map f $ coins gameState,
+  fmap f gameState@GameState { pacMan, grid, coins, ghosts = (blinky, pinky, inky, clyde) } = gameState {
+    pacMan = f pacMan,
+    grid = f grid,
+    coins = map f coins,
     ghosts = (f blinky, f pinky, f inky, f clyde)
   }
-    where
-      (blinky, pinky, inky, clyde) = ghosts gameState
 
 data GhostBehaviour = Clyde | Pinky | Inky | Blinky
 data GhostMode = Scatter | Frighten | Chase

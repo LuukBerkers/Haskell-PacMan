@@ -13,12 +13,12 @@ render _ _ Coin { stateCoin = Eaten } = Blank
 render sprite gameState coin = uncurry translate (tileToScreen $ positionCoin coin) $ rectangleCell spritePosition sprite
   where
     spritePosition :: (Int, Int)
-    spritePosition = animation !! (round (elapsedTime gameState * 5) `mod` length animation)
-
-    animation :: [(Int, Int)]
-    animation = case typeCoin coin of
-      Regular -> [(8, 13)]
-      PowerUp -> map (, 13) [0..7]
+    spritePosition = case typeCoin coin of
+      Regular -> (8, 13)
+      PowerUp -> case map (, 13) [0..7] of
+        -- pick frame from animation bases on elapsedTime
+        -- "!!" cannot fail because of mod length
+        animation ->animation !! (round (elapsedTime gameState * 5) `mod` length animation)
 
 update :: GameState GameObject -> Float -> GameObject -> GameObject
 update _ _ coin@Coin { stateCoin = Eaten } = coin

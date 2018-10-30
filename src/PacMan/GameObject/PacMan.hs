@@ -12,10 +12,10 @@ render :: BitmapData -> GameState GameObject -> GameObject -> Picture
 render sprite _ pacMan = uncurry translate (pointToScreen $ positionPacMan pacMan) $ dirRectangleCell sprite
   where
     dirRectangleCell :: BitmapData -> Picture
-    dirRectangleCell = rectangleCell $ animation !! (round (elapsedPath pacMan / 30) `mod` length animation)
-
-    animation :: [(Int, Int)]
-    animation = map (, y) [4, 5, 6, 7, 6, 5]
+    dirRectangleCell = case map (, y) [4, 5, 6, 7, 6, 5] of
+      -- pick frame from animation based on elapesedPath
+      -- "!!" cannot fail because of mod length
+      animation -> rectangleCell $ animation !! (round (elapsedPath pacMan / 30) `mod` length animation)
       where
         y = case directionPacMan pacMan of
           North -> 7

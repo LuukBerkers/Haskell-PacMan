@@ -100,7 +100,7 @@ update gameState dt ghost = ghost {
 
           -- Inky tries to be to the otherside of Pac-Man compared to Blinky
           Inky   -> pointToCell $ blinkyPosition =+= ((blinkyPosition =-= positionPacMan (pacMan gameState)) =*- 2)
-        Frighten -> undefined
+        Frighten -> pointToCell blinkyPosition =+= getDirVec (head possibleDirections)
 
     blinkyPosition :: Vec2
     blinkyPosition = case ghosts gameState of (blinky, _, _, _) -> positionGhost blinky

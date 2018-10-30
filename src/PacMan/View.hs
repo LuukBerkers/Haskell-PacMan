@@ -10,7 +10,7 @@ import qualified PacMan.GameObject.Grid   as Grid
 import qualified PacMan.GameObject.PacMan as PacMan
 import qualified PacMan.GameObject.Ghost  as Ghost
 
-view :: BitmapData -> GameState GameObject -> IO Picture
+view :: Renderable a => BitmapData -> GameState a -> IO Picture
 view sprite gameState = return $ pictures $ case fmap (render sprite gameState) gameState of
   GameState {
     coins,

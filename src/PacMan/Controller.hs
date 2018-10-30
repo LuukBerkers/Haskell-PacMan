@@ -9,7 +9,7 @@ import qualified PacMan.GameObject.Grid   as Grid
 import qualified PacMan.GameObject.Ghost  as Ghost
 import qualified PacMan.GameObject.PacMan as PacMan
 
-step :: Float -> GameState GameObject -> IO (GameState GameObject)
+step :: Updatable a => Float -> GameState a -> IO (GameState a)
 -- if gameState = Playing update every GameObject
 step dt gameState'@GameState { gameState = Playing, elapsedTime } = return $ fmap (update gameState' dt) gameState' {
   -- increase elapsedTime
@@ -17,7 +17,7 @@ step dt gameState'@GameState { gameState = Playing, elapsedTime } = return $ fma
 }
 step _ gameState' = return gameState'
 
-input :: Event -> GameState GameObject -> IO (GameState GameObject)
+input :: Updatable a => Event -> GameState a -> IO (GameState a)
 -- play pause logic
 input (EventKey (SpecialKey KeyEsc) Down _ _) gameState'@GameState { gameState = Playing } = return gameState' { gameState = Paused }
 input (EventKey (SpecialKey KeyEsc) Down _ _) gameState'@GameState { gameState = Paused } = return gameState' { gameState = Playing }

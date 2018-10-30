@@ -1,7 +1,6 @@
 module PacMan.Helper where
 
 import Data.Fixed
-
 import Codec.BMP
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap

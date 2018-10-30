@@ -1,11 +1,10 @@
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
-module PacMan.View (view) where
+module PacMan.View where
 
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
-
 import PacMan.Model
 import PacMan.Helper
 
@@ -44,12 +43,12 @@ instance Renderable GameObject where
     where
       spritePosition :: (Int, Int)
       spritePosition = animation !! (round (elapsedTime gameState * 5) `mod` length animation)
-  
+
       animation :: [(Int, Int)]
       animation = case typeCoin coin of
         Regular -> [(8, 13)]
         PowerUp -> map (, 13) [0..7]
-  
+
   -- GHOST
   render sprite _ ghost@Ghost {} = uncurry translate (pointToScreen $ positionGhost ghost) $ tilePosition sprite
     where
@@ -70,23 +69,23 @@ instance Renderable GameObject where
         (East,  Clyde)  -> rectangleTile (9,  12)
         (South, Clyde)  -> rectangleTile (10, 12)
         (North, Clyde)  -> rectangleTile (11, 12)
-  
+
   render sprite _ grid@Grid {} = pictures $ zipWith (uncurry translate) coords connectWalls
     where
       coords :: [Vec2]
       coords = [tileToScreen $ fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
-  
+
       connectWalls :: [Picture]
       connectWalls = loopY $ pad $ constructTiles $ tilesGrid grid
-  
+
       loopY :: [[Tile]] -> [Picture]
       loopY ((_ : t) : c : bs@(_ : b) : ys) = loopX t c b ++ loopY (c : bs : ys)
       loopY _                               = []
-  
+
       loopX :: [Tile] -> [Tile] -> [Tile] -> [Picture]
       loopX (t : ts) (l : c : r : xs) (b : bs) = connectWall t l c r b : loopX ts (c : r : xs) bs
       loopX _        _                _        = []
-  
+
       connectWall :: Tile -> Tile -> Tile -> Tile -> Tile -> Picture
       connectWall Wall Wall Wall Wall Wall = rectangleTile (7, 2)  sprite
       connectWall _    Wall Wall Wall Wall = rectangleTile (7, 3)  sprite
@@ -105,9 +104,9 @@ instance Renderable GameObject where
       connectWall Wall _    Wall _    _    = rectangleTile (9, 1)  sprite
       connectWall _    _    Wall _    _    = rectangleTile (8, 0)  sprite
       connectWall _    _    _    _    _    = Blank
-  
+
       pad :: [[Tile]] -> [[Tile]]
       pad tiles = addToStartAndEnd (replicate (width + 2) Empty) $ map (addToStartAndEnd Empty) tiles
-  
+
       width, height :: Int
       (width, height) = size $ lines $ tilesGrid grid

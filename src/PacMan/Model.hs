@@ -1,11 +1,7 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
 module PacMan.Model where
-  
 import Data.Maybe
-
-import Graphics.Gloss.Interface.IO.Game
-
 import PacMan.Helper
 
 data State = Playing | Paused

@@ -71,7 +71,7 @@ update gameState dt pacMan = pacMan {
     gridSize :: Vec2
     gridSize = tileToPoint $ fromIntegralVec2 $ size constructedTiles
 
-keyDown _ keyPressed pacMan = case getDirection of
+keyDown _ key pacMan = case getDirection of
   Nothing             -> pacMan
   Just nextDirection' -> pacMan {
     nextDirectionPacMan = nextDirection',
@@ -81,7 +81,7 @@ keyDown _ keyPressed pacMan = case getDirection of
   }
   where
     getDirection :: Maybe Direction
-    getDirection = case keyPressed of
+    getDirection = case key of
       KeyUp    -> Just North
       KeyRight -> Just East
       KeyDown  -> Just South

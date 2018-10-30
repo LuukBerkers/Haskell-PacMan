@@ -18,7 +18,7 @@ step _ gameState' = return gameState'
 input :: Event -> GameState GameObject -> IO (GameState GameObject)
 input (EventKey (SpecialKey KeyEsc) Down _ _) gameState'@GameState { gameState = Playing } = return gameState' { gameState = Paused }
 input (EventKey (SpecialKey KeyEsc) Down _ _) gameState'@GameState { gameState = Paused } = return gameState' { gameState = Playing }
-input (EventKey (SpecialKey char) Down _ _) gameState' = return $ fmap (keyDown gameState' char) gameState'
+input (EventKey (SpecialKey key) Down _ _) gameState' = return $ fmap (keyDown gameState' key) gameState'
 
 input _ gameState' = return gameState'
 

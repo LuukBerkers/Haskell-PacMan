@@ -13,5 +13,5 @@ class GameObject a where
   update :: TransferObject -> Float -> a -> a
   update _ _ a = a
 
-  key :: TransferObject -> SpecialKey -> a -> a
-  key _ _ a = a
+  keyDown :: TransferObject -> SpecialKey -> a -> a
+  keyDown _ _ a = a

@@ -49,7 +49,6 @@ instance GameObject Ghost where
         (North, Clyde)  -> rectangleTile (11, 12)
 
   update transferObject dt ghost = ghost {
-  -- position = position ghost
     position = position ghost =+=
       (getDirVec (direction ghost) =*- movementCurrentDirection) =+=
       (getDirVec direction' =*- movementNextDirection),
@@ -83,7 +82,7 @@ instance GameObject Ghost where
 
       direction' :: Direction
       direction'
-        | maxMovement - movement < 0 = case sortBy sort' $ filter (/= oppositeDirection (direction ghost)) $ mapMaybe isDirectionWall [North, East, South, West] of
+        | maxMovement - movement < 0 = case sortBy sort' possibleDirections of
           (direction : _) -> direction
           _               -> error "no possible direction found"
         | otherwise = direction ghost
@@ -94,6 +93,9 @@ instance GameObject Ghost where
 
           distanceToDirection :: Direction -> Float
           distanceToDirection direction = lengthVec2 $ pointToTile (position ghost) =+= getDirVec direction =-= targetTile
+
+      possibleDirections :: [Direction]
+      possibleDirections = filter (/= oppositeDirection (direction ghost)) $ mapMaybe isDirectionWall [North, East, South, West]
 
       targetTile :: Vec2
       targetTile

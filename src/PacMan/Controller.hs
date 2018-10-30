@@ -1,16 +1,18 @@
+{-# language NamedFieldPuns #-}
 module PacMan.Controller where
 
 import Graphics.Gloss.Interface.IO.Game
-import PacMan.GameObject.Ghost as Ghost
-import PacMan.Model as Model
-import PacMan.GameObject as GameObject
-import PacMan.TransferObject as TransferObject
+
+import PacMan.GameObject.Ghost  as Ghost
+import PacMan.Model             as Model
+import PacMan.GameObject        as GameObject
+import PacMan.TransferObject    as TransferObject
 import PacMan.GameObject.PacMan as PacMan
-import PacMan.GameObject.Grid as Grid
+import PacMan.GameObject.Grid   as Grid
 
 step :: Float -> GameState -> IO GameState
-step dt gameState = return gameState {
-  elapsedTime = elapsedTime gameState + dt,
+step dt gameState@GameState { state = Playing, elapsedTime } = return gameState {
+  elapsedTime = elapsedTime + dt,
   pacMan = update' $ pacMan gameState,
   grid = update' $ grid gameState,
   coins = map update' $ coins gameState,
@@ -22,6 +24,7 @@ step dt gameState = return gameState {
 
     blinky, pinky, inky, clyde :: Ghost.Ghost
     (blinky, pinky, inky, clyde) = ghosts gameState
+step _ gameState = return gameState
 
 input :: Event -> GameState -> IO GameState
 input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@GameState { state = Playing } = return gameState { state = Paused }
@@ -33,8 +36,8 @@ input (EventKey (SpecialKey char) Down _ _) gameState = return gameState {
   ghosts = (keyDown' blinky, keyDown' pinky, keyDown' inky, keyDown' clyde)
 }
   where
-    key' :: (GameObject.GameObject a) => a -> a
-    key' = GameObject.key (constructTransferObject gameState) char
+    keyDown' :: (GameObject.GameObject a) => a -> a
+    keyDown' = GameObject.keyDown (constructTransferObject gameState) char
 
     blinky, pinky, inky, clyde :: Ghost.Ghost
     (blinky, pinky, inky, clyde) = ghosts gameState

@@ -88,7 +88,7 @@ instance GameObject PacMan where
       gridSize :: Vec2
       gridSize = tileToPoint $ fromIntegralVec2 $ size constructedTiles
 
-  key _ keyPressed pacMan = case getDirection of
+  keyDown _ keyPressed pacMan = case getDirection of
     Nothing             -> pacMan
     Just nextDirection' -> pacMan {
       nextDirection = nextDirection',

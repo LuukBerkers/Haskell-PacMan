@@ -182,7 +182,6 @@ instance Updatable GameObject where
   update _ _ a = a
   
   -- EVENTS
-  
   keyDown _ keyPressed pacMan@PacMan {} = case getDirection of
     Nothing             -> pacMan
     Just nextDirection' -> pacMan {

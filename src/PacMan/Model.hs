@@ -3,7 +3,6 @@ module PacMan.Model where
 import Data.Maybe
 
 import Graphics.Gloss.Interface.IO.Game
-import Graphics.Gloss.Data.Bitmap
 
 import PacMan.Helper
 
@@ -11,7 +10,6 @@ data State = Playing | Paused
 
 data GameState a = GameState {
   gameState :: State,
-  sprite :: BitmapData,
   elapsedTime :: Float,
   lives :: Int,
   grid :: a,
@@ -56,10 +54,9 @@ data GameObject = PacMan {
   tilesGrid :: String
 }
 
-initialState :: String -> BitmapData -> GameState GameObject
-initialState tiles' sprite' = GameState
+initialState :: String -> GameState GameObject
+initialState tiles' = GameState
   Playing
-  sprite'
   0
   3
   (Grid tiles')

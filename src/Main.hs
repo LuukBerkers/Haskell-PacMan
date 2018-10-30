@@ -16,7 +16,7 @@ main = do
       (InWindow "Pac-Man" (width * tileWidth, height * tileHeight) (0, 0))
       black
       fps
-      (initialState level sprite)
-      view
+      (initialState level)
+      (view sprite)
       input
       step

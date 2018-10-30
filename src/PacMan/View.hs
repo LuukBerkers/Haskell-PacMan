@@ -70,6 +70,7 @@ instance Renderable GameObject where
         (South, Clyde)  -> rectangleTile (10, 12)
         (North, Clyde)  -> rectangleTile (11, 12)
 
+  -- GRID
   render sprite _ grid@Grid {} = pictures $ zipWith (uncurry translate) coords connectWalls
     where
       coords :: [Vec2]

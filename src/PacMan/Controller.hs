@@ -27,7 +27,6 @@ input _ gameState' = return gameState'
 
 instance Updatable GameObject where
   -- PacMan
-
   update gameState dt pacMan@PacMan {} = pacMan {
     elapsedPath = elapsedPath pacMan + maxMovement,
     positionPacMan = (positionPacMan pacMan =+=

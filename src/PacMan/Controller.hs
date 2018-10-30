@@ -24,11 +24,13 @@ step dt gameState = return gameState {
     (blinky, pinky, inky, clyde) = ghosts gameState
 
 input :: Event -> GameState -> IO GameState
-input (EventKey (SpecialKey char) _ _ _) gameState = return gameState {
-  pacMan = key' $ pacMan gameState,
-  grid = key' $ grid gameState,
-  coins = map key' $ coins gameState,
-  ghosts = (key' blinky, key' pinky, key' inky, key' clyde)
+input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@GameState { state = Playing } = return gameState { state = Paused }
+input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@GameState { state = Paused } = return gameState { state = Playing }
+input (EventKey (SpecialKey char) Down _ _) gameState = return gameState {
+  pacMan = keyDown' $ pacMan gameState,
+  grid = keyDown' $ grid gameState,
+  coins = map keyDown' $ coins gameState,
+  ghosts = (keyDown' blinky, keyDown' pinky, keyDown' inky, keyDown' clyde)
 }
   where
     key' :: (GameObject.GameObject a) => a -> a

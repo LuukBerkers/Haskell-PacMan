@@ -17,12 +17,6 @@ data GameState = GameState {
   coins :: [Coin]
 }
 
-data GhostBehaviour = Clyde | Pinky | Inky | Blinky
-data GhostMode = Scatter | Frighten | Chase
-
-data CoinState = Eaten | Alive
-data CoinType = Regular | PowerUp
-
 data PacMan = PacMan {
   elapsedPath :: Float,
   positionPacMan :: Vec2,
@@ -31,6 +25,8 @@ data PacMan = PacMan {
   speedPacMan :: Float
 }
 
+data CoinState = Eaten | Alive
+data CoinType = Regular | PowerUp
 data Coin = Coin {
   stateCoin :: CoinState,
   typeCoin :: CoinType,
@@ -41,6 +37,8 @@ data Grid = Grid {
   tilesGrid :: String
 }
 
+data GhostBehaviour = Clyde | Pinky | Inky | Blinky
+data GhostMode = Scatter | Frighten | Chase
 data Ghost = Ghost {
   positionGhost :: Vec2,
   directionGhost :: Direction,

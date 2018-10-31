@@ -18,7 +18,7 @@ instance Renderable Coin where
         PowerUp -> case map (, 13) [0..7] of
           -- pick frame from animation bases on elapsedTime
           -- "!!" cannot fail because of mod length
-          animation ->animation !! (round (elapsedTime gameState * 5) `mod` length animation)
+          animation -> animation !! (round (elapsedTime gameState * 5) `mod` length animation)
 
 instance Updateable Coin where
   update  _ _ coin = coin

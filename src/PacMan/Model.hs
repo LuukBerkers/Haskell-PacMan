@@ -34,7 +34,7 @@ data PacMan = PacMan {
   speedPacMan :: Float
 }
 
-data CoinState = Eaten | Alive
+data CoinState = Eaten | Alive deriving (Eq)
 data CoinType = Regular | PowerUp
 data Coin = Coin {
   stateCoin :: CoinState,
@@ -48,12 +48,14 @@ data Grid = Grid {
 
 data GhostBehaviour = Clyde | Pinky | Inky | Blinky
 data FrightenedMode = Frightened | NotFrightened | Homing
+data SpawnMode = Spawned | NotSpawned
 data Ghost = Ghost {
   positionGhost :: Vec2,
   directionGhost :: Direction,
   speedGhost :: Float,
   behaviourGhost :: GhostBehaviour,
-  frightenedGhost :: FrightenedMode
+  frightenedGhost :: FrightenedMode,
+  spawnMode :: SpawnMode
 }
 
 initialState :: String -> GameState
@@ -66,10 +68,10 @@ initialState tiles' = GameState
   (Grid tiles')
   (PacMan 0 (tileToPoint (13.5, 22)) North North (8 * fromIntegral tileWidth))
   (
-    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened,
-    Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  NotFrightened,
-    Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   NotFrightened,
-    Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  NotFrightened
+    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened NotSpawned,
+    Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky NotFrightened NotSpawned,
+    Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky NotFrightened NotSpawned,
+    Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde NotFrightened NotSpawned
   )
   (mapMaybe convert $ zip coords $ concat $ constructCells tiles')
     where

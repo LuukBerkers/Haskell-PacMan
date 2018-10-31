@@ -38,6 +38,25 @@ instance Renderable Ghost where
         (NotFrightened, North, Clyde)  -> spriteSection (7,  11)
 
 instance Updateable Ghost where
+  update gameState _ ghost@Ghost { spawnMode = NotSpawned } = ghost {
+    spawnMode = spawnMode'
+  }
+    where
+      spawnMode' :: SpawnMode
+      spawnMode' = case behaviourGhost ghost of
+        Inky -> if coinsEaten > 30
+          then Spawned
+          else NotSpawned
+        Clyde -> if coinsEaten > 100
+          then Spawned
+          else NotSpawned
+        _ -> case elapsedPath (pacMan gameState) of
+          0 -> NotSpawned
+          _ -> Spawned
+
+      coinsEaten :: Int
+      coinsEaten = length $ filter (\coin -> stateCoin coin == Eaten) $ coins gameState
+
   update gameState dt ghost = ghost {
     positionGhost = (positionGhost ghost =+=
       (getDirVec (directionGhost ghost) =*- movementCurrentDirection) =+=

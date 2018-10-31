@@ -17,16 +17,13 @@ step :: Float -> GameState -> IO GameState
 step dt gameState@GameState {
   gameMode = Playing,
   elapsedTime,
-  powerUpTimer,
   coins,
   pacMan,
   ghosts = (blinky, pinky, inky, clyde),
   grid
-} = return $ updateCoins $ gameState {
+} = return $ checkGhostCollision dt $ updateGhostMovementRegister dt $ updateCoins dt $ updatePowerUpTimer dt $ gameState {
   -- increase elapsedTime
   elapsedTime = elapsedTime + dt,
-  -- count down powerup timer
-  powerUpTimer = max 0 (powerUpTimer - dt),
   coins = map u coins,
   pacMan = u pacMan,
   ghosts = (u blinky, u pinky, u inky, u clyde),
@@ -37,14 +34,21 @@ step dt gameState@GameState {
     u = update gameState dt
 step _ gameState = return gameState
 
-updateCoins :: GameState -> GameState
-updateCoins gameState@GameState { pacMan, powerUpTimer, coins } = case partition isEaten coins of
-  (left, right) -> gameState {
-    coins = map (\coin -> coin { stateCoin = Eaten }) left ++ right,
-    powerUpTimer = if any isPowerUp left
-      then 10
-      else powerUpTimer
-  }
+updateCoins :: Float -> GameState -> GameState
+updateCoins _ gameState@GameState {
+  pacMan,
+  powerUpTimer,
+  coins,
+  ghosts = (blinky, pinky, inky, clyde)
+} = case partition isEaten coins of
+  (left, right) -> case any isPowerUp left of
+    atePowerUp -> gameState {
+      coins = map (\coin -> coin { stateCoin = Eaten }) left ++ right,
+      powerUpTimer = if atePowerUp then 10 else powerUpTimer,
+      ghosts = if atePowerUp
+        then (frightenGhost blinky, frightenGhost pinky, frightenGhost inky, frightenGhost clyde)
+        else (blinky, pinky, inky, clyde)
+    }
   where
     isEaten :: Coin -> Bool
     isEaten Coin { stateCoin = Eaten } = False
@@ -54,6 +58,49 @@ updateCoins gameState@GameState { pacMan, powerUpTimer, coins } = case partition
     isPowerUp Coin { typeCoin = PowerUp } = True
     isPowerUp _ = False
 
+    frightenGhost :: Ghost -> Ghost
+    frightenGhost ghost@Ghost { frightenedGhost = NotFrightened } = ghost {
+      frightenedGhost = Frightened,
+      directionGhost = oppositeDirection $ directionGhost ghost
+    }
+    frightenGhost ghost = ghost
+
+updateGhostMovementRegister :: Float -> GameState -> GameState
+updateGhostMovementRegister _ gameState@GameState { ghostMovementRegister = (Final _) } = gameState
+updateGhostMovementRegister dt gameState@GameState { ghostMovementRegister = (Step mode time next) } = gameState {
+  ghostMovementRegister = if newTime < 0
+    then next
+    else Step mode newTime next
+}
+  where
+    newTime :: Float
+    newTime = time - dt
+
+updatePowerUpTimer :: Float -> GameState -> GameState
+updatePowerUpTimer _ gameState@GameState { powerUpTimer = 0, ghosts = (blinky, pinky, inky, clyde) } = gameState {
+  ghosts = (unFrighten blinky, unFrighten pinky, unFrighten inky, unFrighten clyde)
+}
+  where
+    unFrighten :: Ghost -> Ghost
+    unFrighten ghost@Ghost { frightenedGhost = Homing } = ghost { frightenedGhost = NotFrightened }
+    unFrighten ghost@Ghost { frightenedGhost = Frightened } = ghost { frightenedGhost = NotFrightened }
+    unFrighten ghost = ghost
+
+updatePowerUpTimer dt gameState@GameState { powerUpTimer } = gameState {
+  -- count down powerup timer
+  powerUpTimer = max 0 (powerUpTimer - dt)
+}
+
+checkGhostCollision :: Float -> GameState -> GameState
+checkGhostCollision _ gameState@GameState { pacMan, ghosts = (blinky, pinky, inky, clyde) } = gameState {
+  ghosts = (f blinky, f pinky, f inky, f clyde)
+}
+  where
+    f :: Ghost -> Ghost
+    f ghost@Ghost { frightenedGhost = Frightened, positionGhost }
+      | roundVec2 (pointToCell $ positionPacMan pacMan) == roundVec2 (pointToCell positionGhost) = ghost { frightenedGhost = Homing }
+      | otherwise = ghost
+    f ghost = ghost
 
 input :: Event -> GameState -> IO GameState
 -- play pause logic

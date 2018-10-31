@@ -11,34 +11,50 @@ import PacMan.Class.Updateable
 instance Renderable Ghost where
   render sprite _ ghost = uncurry translate (pointToScreen $ positionGhost ghost) $ tilePosition sprite
     where
-      tilePosition = case (directionGhost ghost, behaviourGhost ghost) of
-        (West,  Blinky) -> rectangleCell (8,  11)
-        (East,  Blinky) -> rectangleCell (9,  11)
-        (South, Blinky) -> rectangleCell (10, 11)
-        (North, Blinky) -> rectangleCell (11, 11)
-        (West,  Pinky)  -> rectangleCell (4,  12)
-        (East,  Pinky)  -> rectangleCell (5,  12)
-        (South, Pinky)  -> rectangleCell (6,  12)
-        (North, Pinky)  -> rectangleCell (7,  12)
-        (West,  Inky)   -> rectangleCell (0,  12)
-        (East,  Inky)   -> rectangleCell (1,  12)
-        (South, Inky)   -> rectangleCell (2,  12)
-        (North, Inky)   -> rectangleCell (3,  12)
-        (West,  Clyde)  -> rectangleCell (8,  12)
-        (East,  Clyde)  -> rectangleCell (9,  12)
-        (South, Clyde)  -> rectangleCell (10, 12)
-        (North, Clyde)  -> rectangleCell (11, 12)
+      tilePosition = case (frightenedGhost ghost, directionGhost ghost, behaviourGhost ghost) of
+        (Frightened, West, _)          -> rectangleCell (0,  11)
+        (Frightened, East, _)          -> rectangleCell (1,  11)
+        (Frightened, South, _)         -> rectangleCell (2,  11)
+        (Frightened, North, _)         -> rectangleCell (3,  11)
+        (Homing, West, _)              -> rectangleCell (8,  12)
+        (Homing, East, _)              -> rectangleCell (9,  12)
+        (Homing, South, _)             -> rectangleCell (10, 12)
+        (Homing, North, _)             -> rectangleCell (11, 12)
+        (NotFrightened, West,  Blinky) -> rectangleCell (8,  11)
+        (NotFrightened, East,  Blinky) -> rectangleCell (9,  11)
+        (NotFrightened, South, Blinky) -> rectangleCell (10, 11)
+        (NotFrightened, North, Blinky) -> rectangleCell (11, 11)
+        (NotFrightened, West,  Pinky)  -> rectangleCell (4,  12)
+        (NotFrightened, East,  Pinky)  -> rectangleCell (5,  12)
+        (NotFrightened, South, Pinky)  -> rectangleCell (6,  12)
+        (NotFrightened, North, Pinky)  -> rectangleCell (7,  12)
+        (NotFrightened, West,  Inky)   -> rectangleCell (0,  12)
+        (NotFrightened, East,  Inky)   -> rectangleCell (1,  12)
+        (NotFrightened, South, Inky)   -> rectangleCell (2,  12)
+        (NotFrightened, North, Inky)   -> rectangleCell (3,  12)
+        (NotFrightened, West,  Clyde)  -> rectangleCell (4,  11)
+        (NotFrightened, East,  Clyde)  -> rectangleCell (5,  11)
+        (NotFrightened, South, Clyde)  -> rectangleCell (6,  11)
+        (NotFrightened, North, Clyde)  -> rectangleCell (7,  11)
 
 instance Updateable Ghost where
   update gameState dt ghost = ghost {
     positionGhost = (positionGhost ghost =+=
       (getDirVec (directionGhost ghost) =*- movementCurrentDirection) =+=
       (getDirVec direction' =*- movementNextDirection) =+= gridSize) =%= gridSize,
-    directionGhost = direction'
+    directionGhost = direction',
+    frightenedGhost = frightened
   }
     where
+      frightened = case frightenedGhost ghost of
+        Homing | getGrid (positionGhost ghost) == GhostHouse -> NotFrightened
+        _                                                    -> frightenedGhost ghost
+
       movement :: Float
-      movement = speedGhost ghost * dt
+      movement = dt * case frightenedGhost ghost of
+        Frightened    -> fromIntegral tileWidth
+        NotFrightened -> speedGhost ghost
+        Homing        -> fromIntegral tileWidth * 20
 
       maxMovement :: Float
       maxMovement = case directionGhost ghost of
@@ -64,11 +80,14 @@ instance Updateable Ghost where
 
       direction' :: Direction
       direction'
-        | maxMovement - movement < 0 = case sortBy sort' possibleDirections of
-          (direction : _) -> direction
-          _               -> error "no possible direction found"
+        | maxMovement - movement < 0 = case frightenedGhost ghost of
+          Frightened    -> head possibleDirections
+          _             -> case sortBy sort' possibleDirections of
+            (direction : _) -> direction
+            _               -> error "no possible direction found"
         | otherwise = directionGhost ghost
         where
+          sort' :: Direction -> Direction -> Ordering
           sort' a b
             | distanceToDirection a > distanceToDirection b = GT
             | otherwise = LT
@@ -79,28 +98,37 @@ instance Updateable Ghost where
       possibleDirections :: [Direction]
       possibleDirections = filter (/= oppositeDirection (directionGhost ghost)) $ mapMaybe isDirectionWall [North, East, South, West]
 
+      movementMode :: MovementMode
+      movementMode = case ghostMovementRegister gameState of
+        Step movementMode' _ _ -> movementMode'
+        Final movementMode'    -> movementMode'
+
+      wallObjects :: [Cell]
+      wallObjects = case frightenedGhost ghost of
+          NotFrightened | getGrid (positionGhost ghost) == GhostHouse -> [Wall]
+          NotFrightened                                               -> [Wall, GhostHouse]
+          _                                                           -> [Wall]
+
       targetCell :: Vec2
-      targetCell
-        | getGrid (positionGhost ghost) == GhostHouse = (13.5, 10)
-        | otherwise = case modeGhost ghost of
-          Scatter -> scatterModeTargetCell
-          Chase -> case behaviourGhost ghost of
-            -- Blinky directly targets Pac-Man
-            Blinky -> pointToCell $ positionPacMan $ pacMan gameState
-
-            -- Pinky tries to ambush Pac-Man by targeting 4 tiles in front of Pac-Man
-            Pinky  -> pointToCell (positionPacMan $ pacMan gameState) =+= getDirVec (directionPacMan $ pacMan gameState) =*- 4
-
-            -- Clydes has different behaviour based on his distance to packman
-            -- If the distance is larger then 8 tiles he goes back to his scattermode corner
-            -- If the distance is less then 8 tiles he directly chases Pac-Man
-            Clyde   | lengthVec2 (pointToCell (positionGhost ghost =-= positionPacMan (pacMan gameState))) > 8
-                   -> scatterModeTargetCell
-            Clyde  -> pointToCell $ positionPacMan $ pacMan gameState
-
-            -- Inky tries to be to the otherside of Pac-Man compared to Blinky
-            Inky   -> pointToCell $ blinkyPosition =+= ((blinkyPosition =-= positionPacMan (pacMan gameState)) =*- 2)
-          Frighten -> pointToCell blinkyPosition =+= getDirVec (head possibleDirections)
+      targetCell = case frightenedGhost ghost of
+          NotFrightened | getGrid (positionGhost ghost) == GhostHouse -> (13.5, 10)
+          NotFrightened -> case movementMode of
+            Scatter -> scatterModeTargetCell
+            Chase -> case behaviourGhost ghost of
+              -- Blinky directly targets Pac-Man
+              Blinky -> pointToCell $ positionPacMan $ pacMan gameState
+              -- Pinky tries to ambush Pac-Man by targeting 4 tiles in front of Pac-Man
+              Pinky  -> pointToCell (positionPacMan $ pacMan gameState) =+= getDirVec (directionPacMan $ pacMan gameState) =*- 4
+              -- Clydes has different behaviour based on his distance to packman
+              -- If the distance is larger then 8 tiles he goes back to his scattermode corner
+              -- If the distance is less then 8 tiles he directly chases Pac-Man
+              Clyde   | lengthVec2 (pointToCell (positionGhost ghost =-= positionPacMan (pacMan gameState))) > 8
+                     -> scatterModeTargetCell
+              Clyde  -> pointToCell $ positionPacMan $ pacMan gameState
+              -- Inky tries to be to the otherside of Pac-Man compared to Blinky
+              Inky   -> pointToCell $ blinkyPosition =+= ((blinkyPosition =-= positionPacMan (pacMan gameState)) =*- 2)
+          -- Ghost is homing
+          _ -> (13.5, 13)
 
       blinkyPosition :: Vec2
       blinkyPosition = case ghosts gameState of (blinky, _, _, _) -> positionGhost blinky
@@ -125,11 +153,6 @@ instance Updateable Ghost where
       isDirectionWall direction
         | getGrid (positionGhost ghost =+= tileToPoint (getDirVec direction)) `elem` wallObjects = Nothing
         | otherwise = Just direction
-
-      wallObjects :: [Cell]
-      wallObjects
-        | getGrid (positionGhost ghost) == GhostHouse = [Wall]
-        | otherwise = [Wall, GhostHouse]
 
       gridSize :: Vec2
       gridSize = tileToPoint $ fromIntegralVec2 $ size constructedCells

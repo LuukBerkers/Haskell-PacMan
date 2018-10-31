@@ -5,12 +5,21 @@ import Data.Maybe
 import PacMan.Helper
 
 data State = Playing | Paused
+-- data type to store alternating of movement of ghosts
+-- for instance, during the first level the movement mode of the ghots is
+-- Scatter for 7 seconds, then Chase for 20 seconds.
+-- Scatter for 7 seconds, then Chase for 20 seconds.
+-- Scatter for 5 seconds, then Chase for 20 seconds.
+-- Scatter for 5 seconds, then switch to Chase mode permanently.
+data MovementMode = Scatter | Chase
+data MovementModeRegister = Step MovementMode Float MovementModeRegister | Final MovementMode
 
 data GameState = GameState {
   gameMode :: State,
   elapsedTime :: Float,
   powerUpTimer :: Float,
   lives :: Int,
+  ghostMovementRegister :: MovementModeRegister,
   grid :: Grid,
   pacMan :: PacMan,
   ghosts :: (Ghost, Ghost, Ghost, Ghost),
@@ -38,13 +47,13 @@ data Grid = Grid {
 }
 
 data GhostBehaviour = Clyde | Pinky | Inky | Blinky
-data GhostMode = Scatter | Frighten | Chase
+data FrightenedMode = Frightened | NotFrightened | Homing
 data Ghost = Ghost {
   positionGhost :: Vec2,
   directionGhost :: Direction,
   speedGhost :: Float,
   behaviourGhost :: GhostBehaviour,
-  modeGhost :: GhostMode
+  frightenedGhost :: FrightenedMode
 }
 
 initialState :: String -> GameState
@@ -53,13 +62,14 @@ initialState tiles' = GameState
   0
   0
   3
+  (Step Scatter 7 $ Step Chase 20 $ Step Scatter 7 $ Step Chase 20 $ Step Scatter 5 $ Step Chase 20 $ Step Scatter 5 $ Final Chase)
   (Grid tiles')
   (PacMan 0 (tileToPoint (13.5, 22)) North North (8 * fromIntegral tileWidth))
   (
-    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky Chase,
-    Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  Chase,
-    Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   Chase,
-    Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  Chase
+    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened,
+    Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  NotFrightened,
+    Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   NotFrightened,
+    Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  NotFrightened
   )
   (mapMaybe convert $ zip coords $ concat $ constructCells tiles')
     where

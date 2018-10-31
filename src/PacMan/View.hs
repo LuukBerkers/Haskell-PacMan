@@ -10,17 +10,19 @@ import qualified PacMan.GameObject.Grid   as Grid
 import qualified PacMan.GameObject.PacMan as PacMan
 import qualified PacMan.GameObject.Ghost  as Ghost
 
-view :: Renderable a => BitmapData -> GameState a -> IO Picture
-view sprite gameState = return $ pictures $ case fmap (render sprite gameState) gameState of
-  GameState {
-    coins,
-    pacMan,
-    ghosts = (blinky, pinky, inky, clyde),
-    grid
-  } -> grid : coins ++ [pacMan, blinky, pinky, inky, clyde]
+view :: BitmapData -> GameState -> IO Picture
+view sprite gameState@GameState {
+  coins,
+  pacMan,
+  ghosts = (blinky, pinky, inky, clyde),
+  grid
+} = return $ pictures $ render' grid : map render' coins ++ [render' pacMan, render' blinky, render' pinky, render' inky, render' clyde]
+  where
+    render' :: Renderable a => a -> Picture
+    render' = render sprite gameState
 
 class Renderable a where
-  render :: BitmapData -> GameState a -> a -> Picture
+  render :: BitmapData -> GameState -> a -> Picture
 
 instance Renderable GameObject where
   render sprite gameState gameObject@Grid {} = Grid.render sprite gameState gameObject

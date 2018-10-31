@@ -6,7 +6,7 @@ import Graphics.Gloss.Interface.IO.Game
 import PacMan.Model hiding (grid)
 import PacMan.Helper
 
-render :: BitmapData -> GameState GameObject -> GameObject -> Picture
+render :: BitmapData -> GameState -> GameObject -> Picture
 render sprite _ grid = pictures $ zipWith (uncurry translate) coords connectWalls
     where
       coords :: [Vec2]
@@ -48,8 +48,8 @@ render sprite _ grid = pictures $ zipWith (uncurry translate) coords connectWall
       width, height :: Int
       (width, height) = size $ lines $ tilesGrid grid
 
-update :: GameState GameObject -> Float -> GameObject -> GameObject
+update :: GameState -> Float -> GameObject -> GameObject
 update _ _ a = a
 
-keyDown :: GameState GameObject -> SpecialKey -> GameObject -> GameObject
+keyDown :: GameState -> SpecialKey -> GameObject -> GameObject
 keyDown _ _ a = a

@@ -6,23 +6,15 @@ import PacMan.Helper
 
 data State = Playing | Paused
 
-data GameState a = GameState {
+data GameState = GameState {
   gameMode :: State,
   elapsedTime :: Float,
   lives :: Int,
-  grid :: a,
-  pacMan :: a,
-  ghosts :: (a, a, a, a),
-  coins :: [a]
+  grid :: GameObject,
+  pacMan :: GameObject,
+  ghosts :: (GameObject, GameObject, GameObject, GameObject),
+  coins :: [GameObject]
 }
-
-instance Functor GameState where
-  fmap f gameState@GameState { pacMan, grid, coins, ghosts = (blinky, pinky, inky, clyde) } = gameState {
-    pacMan = f pacMan,
-    grid = f grid,
-    coins = map f coins,
-    ghosts = (f blinky, f pinky, f inky, f clyde)
-  }
 
 data GhostBehaviour = Clyde | Pinky | Inky | Blinky
 data GhostMode = Scatter | Frighten | Chase
@@ -50,7 +42,7 @@ data GameObject = PacMan {
   tilesGrid :: String
 }
 
-initialState :: String -> GameState GameObject
+initialState :: String -> GameState
 initialState tiles' = GameState
   Playing
   0

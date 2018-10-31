@@ -8,7 +8,7 @@ import Graphics.Gloss.Interface.IO.Game
 import PacMan.Model
 import PacMan.Helper
 
-render :: BitmapData -> GameState GameObject -> GameObject -> Picture
+render :: BitmapData -> GameState -> GameObject -> Picture
 render sprite _ ghost = uncurry translate (pointToScreen $ positionGhost ghost) $ tilePosition sprite
   where
     tilePosition = case (directionGhost ghost, behaviourGhost ghost) of
@@ -29,7 +29,7 @@ render sprite _ ghost = uncurry translate (pointToScreen $ positionGhost ghost) 
       (South, Clyde)  -> rectangleCell (10, 12)
       (North, Clyde)  -> rectangleCell (11, 12)
 
-update :: GameState GameObject -> Float -> GameObject -> GameObject
+update :: GameState -> Float -> GameObject -> GameObject
 update gameState dt ghost = ghost {
   positionGhost = (positionGhost ghost =+=
     (getDirVec (directionGhost ghost) =*- movementCurrentDirection) =+=
@@ -134,5 +134,5 @@ update gameState dt ghost = ghost {
     gridSize :: Vec2
     gridSize = tileToPoint $ fromIntegralVec2 $ size constructedCells
 
-keyDown :: GameState GameObject -> SpecialKey -> GameObject -> GameObject
+keyDown :: GameState -> SpecialKey -> GameObject -> GameObject
 keyDown _ _ a = a

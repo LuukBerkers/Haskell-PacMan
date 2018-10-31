@@ -1,13 +1,13 @@
 module PacMan.GameObject.Grid where
 
 import Graphics.Gloss.Data.Picture
-import Graphics.Gloss.Data.Bitmap
-import Graphics.Gloss.Interface.IO.Game
 import PacMan.Model hiding (grid)
 import PacMan.Helper
+import PacMan.Class.Renderable
+import PacMan.Class.Updateable
 
-render :: BitmapData -> GameState -> GameObject -> Picture
-render sprite _ grid = pictures $ zipWith (uncurry translate) coords connectWalls
+instance Renderable Grid where
+  render sprite _ grid = pictures $ zipWith (uncurry translate) coords connectWalls
     where
       coords :: [Vec2]
       coords = [tileToScreen $ fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
@@ -48,8 +48,6 @@ render sprite _ grid = pictures $ zipWith (uncurry translate) coords connectWall
       width, height :: Int
       (width, height) = size $ lines $ tilesGrid grid
 
-update :: GameState -> Float -> GameObject -> GameObject
-update _ _ a = a
-
-keyDown :: GameState -> SpecialKey -> GameObject -> GameObject
-keyDown _ _ a = a
+instance Updateable Grid where
+  update  _ _ a = a
+  keyDown _ _ a = a

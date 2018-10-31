@@ -103,8 +103,8 @@ oppositeDirection East  = West
 oppositeDirection South = North
 oppositeDirection West  = East
 
-rectangleCell :: (Int, Int) -> BitmapData -> Picture
-rectangleCell (x, y) = bitmapSection $ Rectangle (1 + x * (tileWidth + 1), 1 + y * (tileHeight + 1)) (tileWidth, tileHeight)
+spriteSection :: (Int, Int) -> BitmapData -> Picture
+spriteSection (x, y) = bitmapSection $ Rectangle (1 + x * (tileWidth + 1), 1 + y * (tileHeight + 1)) (tileWidth, tileHeight)
 
 gridElement :: [[Cell]] -> (Int, Int) -> Cell
 gridElement ((h : _ ) : _)  (0, 0) = h

@@ -10,7 +10,7 @@ import PacMan.Class.Updateable
 
 instance Renderable Coin where
   render _ _ Coin { stateCoin = Eaten } = Blank
-  render sprite gameState coin = uncurry translate (tileToScreen $ positionCoin coin) $ rectangleCell spritePosition sprite
+  render sprite gameState coin = uncurry translate (tileToScreen $ positionCoin coin) $ spriteSection spritePosition sprite
     where
       spritePosition :: (Int, Int)
       spritePosition = case typeCoin coin of

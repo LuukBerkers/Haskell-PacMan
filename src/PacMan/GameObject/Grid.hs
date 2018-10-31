@@ -24,22 +24,22 @@ instance Renderable Grid where
       loopX _        _                _        = []
 
       connectWall :: Cell -> Cell -> Cell -> Cell -> Cell -> Picture
-      connectWall Wall Wall Wall Wall Wall = rectangleCell (7, 2)  sprite
-      connectWall _    Wall Wall Wall Wall = rectangleCell (7, 3)  sprite
-      connectWall Wall _    Wall Wall Wall = rectangleCell (6, 2)  sprite
-      connectWall Wall Wall Wall _    Wall = rectangleCell (8, 2)  sprite
-      connectWall Wall Wall Wall Wall _    = rectangleCell (7, 1)  sprite
-      connectWall _    _    Wall Wall Wall = rectangleCell (6, 3)  sprite
-      connectWall _    Wall Wall _    Wall = rectangleCell (8, 3)  sprite
-      connectWall Wall _    Wall Wall _    = rectangleCell (6, 1)  sprite
-      connectWall Wall Wall Wall _    _    = rectangleCell (8, 1)  sprite
-      connectWall _    Wall Wall Wall _    = rectangleCell (7, 0)  sprite
-      connectWall Wall _    Wall _    Wall = rectangleCell (6, 0)  sprite
-      connectWall _    _    Wall _    Wall = rectangleCell (10, 1) sprite
-      connectWall _    _    Wall Wall _    = rectangleCell (9, 0)  sprite
-      connectWall _    Wall Wall _    _    = rectangleCell (10, 0) sprite
-      connectWall Wall _    Wall _    _    = rectangleCell (9, 1)  sprite
-      connectWall _    _    Wall _    _    = rectangleCell (8, 0)  sprite
+      connectWall Wall Wall Wall Wall Wall = spriteSection (7, 2)  sprite
+      connectWall _    Wall Wall Wall Wall = spriteSection (7, 3)  sprite
+      connectWall Wall _    Wall Wall Wall = spriteSection (6, 2)  sprite
+      connectWall Wall Wall Wall _    Wall = spriteSection (8, 2)  sprite
+      connectWall Wall Wall Wall Wall _    = spriteSection (7, 1)  sprite
+      connectWall _    _    Wall Wall Wall = spriteSection (6, 3)  sprite
+      connectWall _    Wall Wall _    Wall = spriteSection (8, 3)  sprite
+      connectWall Wall _    Wall Wall _    = spriteSection (6, 1)  sprite
+      connectWall Wall Wall Wall _    _    = spriteSection (8, 1)  sprite
+      connectWall _    Wall Wall Wall _    = spriteSection (7, 0)  sprite
+      connectWall Wall _    Wall _    Wall = spriteSection (6, 0)  sprite
+      connectWall _    _    Wall _    Wall = spriteSection (10, 1) sprite
+      connectWall _    _    Wall Wall _    = spriteSection (9, 0)  sprite
+      connectWall _    Wall Wall _    _    = spriteSection (10, 0) sprite
+      connectWall Wall _    Wall _    _    = spriteSection (9, 1)  sprite
+      connectWall _    _    Wall _    _    = spriteSection (8, 0)  sprite
       connectWall _    _    _    _    _    = Blank
 
       pad :: [[Cell]] -> [[Cell]]

@@ -17,7 +17,7 @@ view sprite gameState@GameState {
   pacMan,
   ghosts = (blinky, pinky, inky, clyde),
   grid
-} = return $ pictures $ render' grid : map render' coins ++ [render' pacMan, render' blinky, render' pinky, render' inky, render' clyde]
+} = return $ pictures $ r grid : map r coins ++ [r pacMan, r blinky, r pinky, r inky, r clyde]
   where
-    render' :: Renderable a => a -> Picture
-    render' = render sprite gameState
+    r :: Renderable a => a -> Picture
+    r = render sprite gameState

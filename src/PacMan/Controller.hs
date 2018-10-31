@@ -24,14 +24,14 @@ step dt gameState@GameState {
 } = return $ updateCoins $ gameState {
   -- increase elapsedTime
   elapsedTime = elapsedTime + dt,
-  coins = map update' coins,
-  pacMan = update' pacMan,
-  ghosts = (update' blinky, update' pinky, update' inky, update' clyde),
-  grid = update' grid
+  coins = map u coins,
+  pacMan = u pacMan,
+  ghosts = (u blinky, u pinky, u inky, u clyde),
+  grid = u grid
 }
   where
-    update' :: Updateable a => a -> a
-    update' = update gameState dt
+    u :: Updateable a => a -> a
+    u = update gameState dt
 step _ gameState = return gameState
 
 updateCoins :: GameState -> GameState
@@ -57,13 +57,13 @@ input (EventKey (SpecialKey key) Down _ _) gameState@GameState {
   ghosts = (blinky, pinky, inky, clyde),
   grid
 } = return $ gameState {
-  coins = map keyDown' coins,
-  pacMan = keyDown' pacMan,
-  ghosts = (keyDown' blinky, keyDown' pinky, keyDown' inky, keyDown' clyde),
-  grid = keyDown' grid
+  coins = map k coins,
+  pacMan = k pacMan,
+  ghosts = (k blinky, k pinky, k inky, k clyde),
+  grid = k grid
 }
   where
-    keyDown' :: Updateable a => a -> a
-    keyDown' = keyDown gameState key
+    k :: Updateable a => a -> a
+    k = keyDown gameState key
 
 input _ gameState = return gameState

@@ -43,15 +43,15 @@ instance Updateable Ghost where
   }
     where
       spawnMode' :: SpawnMode
-      spawnMode' = case behaviourGhost ghost of
-        Inky -> if coinsEaten > 30
-          then Spawned
-          else NotSpawned
-        Clyde -> if coinsEaten > 100
-          then Spawned
-          else NotSpawned
-        _ -> case elapsedPath (pacMan gameState) of
-          0 -> NotSpawned
+      spawnMode' = case elapsedPath (pacMan gameState) of
+        0 -> NotSpawned
+        _ -> case behaviourGhost ghost of
+          Inky -> if coinsEaten > 30
+            then Spawned
+            else NotSpawned
+          Clyde -> if coinsEaten > 100
+            then Spawned
+            else NotSpawned
           _ -> Spawned
 
       coinsEaten :: Int
@@ -65,9 +65,11 @@ instance Updateable Ghost where
     frightenedGhost = frightened
   }
     where
+      frightened :: FrightenedMode
       frightened = case frightenedGhost ghost of
         Homing | getGrid (positionGhost ghost) == GhostHouse -> NotFrightened
-        _                                                    -> frightenedGhost ghost
+        Frightened | roundVec2 (pointToCell $ positionPacMan $ pacMan gameState) == roundVec2 (pointToCell $ positionGhost ghost) -> Homing
+        _ -> frightenedGhost ghost
 
       movement :: Float
       movement = dt * case frightenedGhost ghost of

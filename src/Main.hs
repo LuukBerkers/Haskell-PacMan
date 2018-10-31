@@ -12,7 +12,7 @@ main = do
   level  <- readFile "data/level.txt"
   case size $ lines level of
     (width, height) -> playIO
-      (InWindow "Pac-Man" (width * tileWidth, height * tileHeight) (0, 0))
+      (InWindow "Pac-Man" (width * tileWidth, (height + 6) * tileHeight) (0, 0))
       black
       fps
       (initialState level)

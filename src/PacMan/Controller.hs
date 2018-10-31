@@ -14,24 +14,49 @@ import PacMan.Class.Updateable
 
 step :: Float -> GameState -> IO GameState
 -- if gameState = Playing update every GameObject
-step dt gameState@GameState {
-  gameMode = Playing,
-  elapsedTime,
-  coins,
-  pacMan,
-  ghosts = (blinky, pinky, inky, clyde),
-  grid
-} = return $ checkGhostCollision dt $ updateGhostMovementRegister dt $ updateCoins dt $ updatePowerUpTimer dt $ gameState {
-  -- increase elapsedTime
-  elapsedTime = elapsedTime + dt,
-  coins = map u coins,
-  pacMan = u pacMan,
-  ghosts = (u blinky, u pinky, u inky, u clyde),
-  grid = u grid
-}
-  where
-    u :: Updateable a => a -> a
-    u = update gameState dt
+step dt gameState@GameState { gameMode = Playing, elapsedTime, lives, coins, pacMan, ghosts = (blinky, pinky, inky, clyde), grid }
+  -- Advance to next level
+  | all coinIsEaten coins = return gameState {
+    elapsedTime = 0,
+    powerUpTimer = 0,
+    ghostMovementRegister = defaultMovementModeRegister,
+    pacMan = defaultPacMan,
+    ghosts = defaultGhosts,
+    coins = (defaultCoins $ tilesGrid grid)
+  }
+  -- Check if PacMan died
+  | die blinky || die pinky || die inky || die clyde = return gameState {
+    lives = lives - 1,
+    powerUpTimer = 0,
+    elapsedTime = 0,
+    ghosts = defaultGhosts,
+    pacMan = defaultPacMan
+  }
+  -- Update game
+  | otherwise = return $
+    updateGhostMovementRegister dt $
+    updateCoins dt $
+    updatePowerUpTimer dt $
+    gameState {
+      -- increase elapsedTime
+      elapsedTime = elapsedTime + dt,
+      coins = map u coins,
+      pacMan = u pacMan,
+      ghosts = (u blinky, u pinky, u inky, u clyde),
+      grid = u grid
+    }
+    where
+      u :: Updateable a => a -> a
+      u = update gameState dt
+
+      coinIsEaten :: Coin -> Bool
+      coinIsEaten Coin { stateCoin = Eaten } = True
+      coinIsEaten _                          = False
+
+      die :: Ghost -> Bool
+      die Ghost { frightenedGhost = NotFrightened, positionGhost } = roundVec2 (pointToCell $ positionPacMan pacMan) == roundVec2 (pointToCell positionGhost)
+      die _ = False
+
 step _ gameState = return gameState
 
 updateCoins :: Float -> GameState -> GameState
@@ -39,12 +64,16 @@ updateCoins _ gameState@GameState {
   pacMan,
   powerUpTimer,
   coins,
+  highScore,
   ghosts = (blinky, pinky, inky, clyde)
 } = case partition isEaten coins of
   (left, right) -> case any isPowerUp left of
     atePowerUp -> gameState {
+      highScore = highScore + countScore left,
       coins = map (\coin -> coin { stateCoin = Eaten }) left ++ right,
-      powerUpTimer = if atePowerUp then 10 else powerUpTimer,
+      powerUpTimer = if atePowerUp
+        then 10
+        else powerUpTimer,
       ghosts = if atePowerUp
         then (frightenGhost blinky, frightenGhost pinky, frightenGhost inky, frightenGhost clyde)
         else (blinky, pinky, inky, clyde)
@@ -64,6 +93,11 @@ updateCoins _ gameState@GameState {
       directionGhost = oppositeDirection $ directionGhost ghost
     }
     frightenGhost ghost = ghost
+
+    countScore :: [Coin] -> Int
+    countScore [] = 0
+    countScore (Coin { typeCoin = PowerUp } : xs) = 50 + countScore xs
+    countScore (Coin { typeCoin = Regular } : xs) = 10 + countScore xs
 
 updateGhostMovementRegister :: Float -> GameState -> GameState
 updateGhostMovementRegister _ gameState@GameState { ghostMovementRegister = (Final _) } = gameState
@@ -90,17 +124,6 @@ updatePowerUpTimer dt gameState@GameState { powerUpTimer } = gameState {
   -- count down powerup timer
   powerUpTimer = max 0 (powerUpTimer - dt)
 }
-
-checkGhostCollision :: Float -> GameState -> GameState
-checkGhostCollision _ gameState@GameState { pacMan, ghosts = (blinky, pinky, inky, clyde) } = gameState {
-  ghosts = (f blinky, f pinky, f inky, f clyde)
-}
-  where
-    f :: Ghost -> Ghost
-    f ghost@Ghost { frightenedGhost = Frightened, positionGhost }
-      | roundVec2 (pointToCell $ positionPacMan pacMan) == roundVec2 (pointToCell positionGhost) = ghost { frightenedGhost = Homing }
-      | otherwise = ghost
-    f ghost = ghost
 
 input :: Event -> GameState -> IO GameState
 -- play pause logic

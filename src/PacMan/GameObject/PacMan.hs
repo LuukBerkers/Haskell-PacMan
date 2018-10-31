@@ -11,10 +11,10 @@ import PacMan.Class.Renderable
 import PacMan.Class.Updateable
 
 instance Renderable PacMan where
-  render sprite _ pacMan = uncurry translate (pointToScreen $ positionPacMan pacMan) $ dirRectangleCell sprite
+  render sprite gameState pacMan = uncurry translate (pointToScreen $ positionPacMan pacMan) $ dirRectangleCell sprite
     where
       dirRectangleCell :: BitmapData -> Picture
-      dirRectangleCell = case map (, y) [4, 5, 6, 7, 6, 5] of
+      dirRectangleCell = case map (, y) xs of
         -- pick frame from animation based on elapesedPath
         -- "!!" cannot fail because of mod length
         animation -> rectangleCell $ animation !! (round (elapsedPath pacMan / 30) `mod` length animation)
@@ -24,6 +24,9 @@ instance Renderable PacMan where
             East  -> 9
             South -> 8
             West  -> 10
+          xs = case powerUpTimer gameState of
+            0 -> [4, 5, 6, 7, 6, 5]
+            _ -> [0, 1, 2, 3, 2, 1]
 
 instance Updateable PacMan where
   update gameState dt pacMan = pacMan {

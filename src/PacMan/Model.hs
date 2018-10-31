@@ -9,6 +9,7 @@ data State = Playing | Paused
 data GameState = GameState {
   gameMode :: State,
   elapsedTime :: Float,
+  powerUpTimer :: Float,
   lives :: Int,
   grid :: Grid,
   pacMan :: PacMan,
@@ -51,6 +52,7 @@ data Ghost = Ghost {
 initialState :: String -> GameState
 initialState tiles' = GameState
   Playing
+  0
   0
   3
   (Grid tiles')

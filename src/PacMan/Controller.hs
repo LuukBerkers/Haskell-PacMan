@@ -35,7 +35,7 @@ step dt gameState@GameState { gameMode = Playing, elapsedTime, lives, level, coi
   }
   -- Update game
   | otherwise = return $
-    updateghostMovementProgress dt $
+    updateGhostMovementProgress dt $
     updateCoins dt $
     updatePowerUpTimer dt $
     gameState {
@@ -55,7 +55,10 @@ step dt gameState@GameState { gameMode = Playing, elapsedTime, lives, level, coi
       coinIsEaten _                          = False
 
       die :: Ghost -> Bool
-      die Ghost { frightenedGhost = NotFrightened, positionGhost } = roundVec2 (pointToCell $ positionPacMan pacMan) == roundVec2 (pointToCell positionGhost)
+      die Ghost {
+        frightenedGhost = NotFrightened,
+        positionGhost
+      } = roundVec2 (pointToCell $ positionPacMan pacMan) == roundVec2 (pointToCell positionGhost)
       die _ = False
 
 step _ gameState = return gameState
@@ -100,9 +103,9 @@ updateCoins _ gameState@GameState {
     countScore (Coin { typeCoin = PowerUp } : xs) = 50 + countScore xs
     countScore (Coin { typeCoin = Regular } : xs) = 10 + countScore xs
 
-updateghostMovementProgress :: Float -> GameState -> GameState
-updateghostMovementProgress _ gameState@GameState { ghostMovementProgress = (Final _) } = gameState
-updateghostMovementProgress dt gameState@GameState { ghostMovementProgress = (Step mode time next) } = gameState {
+updateGhostMovementProgress :: Float -> GameState -> GameState
+updateGhostMovementProgress _ gameState@GameState { ghostMovementProgress = (Final _) } = gameState
+updateGhostMovementProgress dt gameState@GameState { ghostMovementProgress = (Step mode time next) } = gameState {
   ghostMovementProgress = if newTime < 0
     then next
     else Step mode newTime next

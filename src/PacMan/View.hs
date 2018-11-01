@@ -29,13 +29,13 @@ view sprite gameState@GameState {
     render' = render sprite gameState
 
 drawUI :: BitmapData -> GameState -> Picture
-drawUI sprite GameState { lives, highScore } = pictures $ highscore : highscoreValue : livesLeft
+drawUI sprite GameState { lives, score, level } = pictures $ levelHeader : levelValue : scoreHeader : scoreValue : livesLeft
   where
-    highscore :: Picture
-    highscore = uncurry translate (tileToScreen (13.5, -2)) $ scale 0.1 0.1 $ color white $ Text "High Score"
-
-    highscoreValue :: Picture
-    highscoreValue = uncurry translate (tileToScreen (13.5, -1)) $ scale 0.1 0.1 $ color white $ Text $ show highScore
+    scoreHeader, scoreValue, levelHeader, levelValue :: Picture
+    scoreHeader = uncurry translate (tileToScreen (13.5, -2)) $ scale 0.1 0.1 $ color white $ Text "Score"
+    scoreValue = uncurry translate (tileToScreen (13.5, -1)) $ scale 0.1 0.1 $ color white $ Text $ show score
+    levelHeader = uncurry translate (tileToScreen (1, -2)) $ scale 0.1 0.1 $ color white $ Text "Level"
+    levelValue = uncurry translate (tileToScreen (1, -1)) $ scale 0.1 0.1 $ color white $ Text $ show $ level + 1
 
     livesLeft :: [Picture]
     livesLeft = map (\x -> uncurry translate (tileToScreen (fromIntegral x * 2, 31)) $ spriteSection (4, 9) sprite) [1..lives]

@@ -12,16 +12,27 @@ data State = Playing | Paused
 -- Scatter for 5 seconds, then Chase for 20 seconds.
 -- Scatter for 5 seconds, then switch to Chase mode permanently.
 data MovementMode = Scatter | Chase
-data MovementModeRegister = Step MovementMode Float MovementModeRegister | Final MovementMode
-defaultMovementModeRegister = Step Scatter 7 $ Step Chase 20 $ Step Scatter 7 $ Step Chase 20 $ Step Scatter 5 $ Step Chase 20 $ Step Scatter 5 $ Final Chase
+
+data MovementModeProgress = Step MovementMode Float MovementModeProgress | Final MovementMode
+defaultMovementModeProgress :: MovementModeProgress
+defaultMovementModeProgress =
+  Step Scatter 7 $
+  Step Chase 20 $
+  Step Scatter 7 $
+  Step Chase 20 $
+  Step Scatter 5 $
+  Step Chase 20 $
+  Step Scatter 5 $
+  Final Chase
 
 data GameState = GameState {
   gameMode :: State,
   elapsedTime :: Float,
   powerUpTimer :: Float,
-  highScore :: Int,
+  score :: Int,
+  level :: Int,
   lives :: Int,
-  ghostMovementRegister :: MovementModeRegister,
+  ghostMovementProgress :: MovementModeProgress,
   grid :: Grid,
   pacMan :: PacMan,
   ghosts :: (Ghost, Ghost, Ghost, Ghost),
@@ -81,4 +92,10 @@ defaultGhosts = (
   )
 
 initialState :: String -> GameState
-initialState tiles = GameState Playing 0 0 0 3 defaultMovementModeRegister (Grid tiles) defaultPacMan defaultGhosts (defaultCoins tiles)
+initialState tiles = GameState Playing
+  0 0 0 0 3
+  defaultMovementModeProgress
+  (Grid tiles)
+  defaultPacMan
+  defaultGhosts
+  (defaultCoins tiles)

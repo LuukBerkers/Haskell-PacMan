@@ -14,17 +14,18 @@ import PacMan.Class.Updateable
 
 step :: Float -> GameState -> IO GameState
 -- if gameState = Playing update every GameObject
-step dt gameState@GameState { gameMode = Playing, elapsedTime, lives, coins, pacMan, ghosts = (blinky, pinky, inky, clyde), grid }
-  -- Advance to next level
+step dt gameState@GameState { gameMode = Playing, elapsedTime, lives, level, coins, pacMan, ghosts = (blinky, pinky, inky, clyde), grid }
+  -- If all coins are eaten, advance to next level
   | all coinIsEaten coins = return gameState {
+    level = level + 1,
     elapsedTime = 0,
     powerUpTimer = 0,
-    ghostMovementRegister = defaultMovementModeRegister,
+    ghostMovementProgress = defaultMovementModeProgress,
     pacMan = defaultPacMan,
     ghosts = defaultGhosts,
-    coins = (defaultCoins $ tilesGrid grid)
+    coins = defaultCoins $ tilesGrid grid
   }
-  -- Check if PacMan died
+  -- Check if Pac-Man died
   | die blinky || die pinky || die inky || die clyde = return gameState {
     lives = lives - 1,
     powerUpTimer = 0,
@@ -34,7 +35,7 @@ step dt gameState@GameState { gameMode = Playing, elapsedTime, lives, coins, pac
   }
   -- Update game
   | otherwise = return $
-    updateGhostMovementRegister dt $
+    updateghostMovementProgress dt $
     updateCoins dt $
     updatePowerUpTimer dt $
     gameState {
@@ -64,12 +65,12 @@ updateCoins _ gameState@GameState {
   pacMan,
   powerUpTimer,
   coins,
-  highScore,
+  score,
   ghosts = (blinky, pinky, inky, clyde)
 } = case partition isEaten coins of
   (left, right) -> case any isPowerUp left of
     atePowerUp -> gameState {
-      highScore = highScore + countScore left,
+      score = score + countScore left,
       coins = map (\coin -> coin { stateCoin = Eaten }) left ++ right,
       powerUpTimer = if atePowerUp
         then 10
@@ -99,10 +100,10 @@ updateCoins _ gameState@GameState {
     countScore (Coin { typeCoin = PowerUp } : xs) = 50 + countScore xs
     countScore (Coin { typeCoin = Regular } : xs) = 10 + countScore xs
 
-updateGhostMovementRegister :: Float -> GameState -> GameState
-updateGhostMovementRegister _ gameState@GameState { ghostMovementRegister = (Final _) } = gameState
-updateGhostMovementRegister dt gameState@GameState { ghostMovementRegister = (Step mode time next) } = gameState {
-  ghostMovementRegister = if newTime < 0
+updateghostMovementProgress :: Float -> GameState -> GameState
+updateghostMovementProgress _ gameState@GameState { ghostMovementProgress = (Final _) } = gameState
+updateghostMovementProgress dt gameState@GameState { ghostMovementProgress = (Step mode time next) } = gameState {
+  ghostMovementProgress = if newTime < 0
     then next
     else Step mode newTime next
 }

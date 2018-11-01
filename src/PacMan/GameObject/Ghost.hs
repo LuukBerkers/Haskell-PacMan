@@ -120,7 +120,7 @@ instance Updateable Ghost where
       possibleDirections = filter (/= oppositeDirection (directionGhost ghost)) $ mapMaybe isDirectionWall [North, East, South, West]
 
       movementMode :: MovementMode
-      movementMode = case ghostMovementRegister gameState of
+      movementMode = case ghostMovementProgress gameState of
         Step movementMode' _ _ -> movementMode'
         Final movementMode'    -> movementMode'
 

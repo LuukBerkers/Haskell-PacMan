@@ -14,24 +14,36 @@ import PacMan.Class.Updateable
 
 step :: Float -> GameState -> IO GameState
 -- if gameState = Playing update every GameObject
-step dt gameState@GameState { gameMode = Playing, elapsedTime, lives, level, coins, pacMan, ghosts = (blinky, pinky, inky, clyde), grid }
+step dt gameState@GameState {
+  gameMode = Playing,
+  elapsedTime,
+  levelProgress,
+  lives,
+  level,
+  coins,
+  pacMan,
+  ghosts = (blinky, pinky, inky, clyde), grid
+}
   -- If all coins are eaten, advance to next level
   | all coinIsEaten coins = return gameState {
-    level = level + 1,
-    elapsedTime = 0,
-    powerUpTimer = 0,
-    ghostMovementProgress = defaultMovementModeProgress,
-    pacMan = defaultPacMan,
-    ghosts = defaultGhosts,
-    coins = defaultCoins $ tilesGrid grid
+    levelProgress = nextLevelProgress,                -- update level progress
+    ghostMovementProgress = nextMovementModeProgress, -- update movement mode progress
+    powerUpDuration = nextPowerUpDuration,            -- update power up duration
+    level = level + 1,                                -- increase level
+    elapsedTime = 0,                                  -- reset elapsed time
+    powerUpTimer = 0,                                 -- reset power up timer
+    pacMan = defaultPacMan,                           -- reset Pac-Man
+    ghosts = defaultGhosts,                           -- reset Ghosts
+    coins = defaultCoins $ tilesGrid grid             -- reset coins
   }
   -- Check if Pac-Man died
   | die blinky || die pinky || die inky || die clyde = return gameState {
-    lives = lives - 1,
-    powerUpTimer = 0,
-    elapsedTime = 0,
-    ghosts = defaultGhosts,
-    pacMan = defaultPacMan
+    lives = lives - 1,                                   -- decrease lives
+    ghostMovementProgress = currentMovementModeProgress, -- reset movement progress
+    powerUpTimer = 0,                                    -- reset power up timer
+    elapsedTime = 0,                                     -- reset elapsed time
+    ghosts = defaultGhosts,                              -- reset ghosts
+    pacMan = defaultPacMan                               -- reset Pac-Man
   }
   -- Update game
   | otherwise = return $
@@ -41,14 +53,14 @@ step dt gameState@GameState { gameMode = Playing, elapsedTime, lives, level, coi
     gameState {
       -- increase elapsedTime
       elapsedTime = elapsedTime + dt,
-      coins = map u coins,
-      pacMan = u pacMan,
-      ghosts = (u blinky, u pinky, u inky, u clyde),
-      grid = u grid
+      coins = map update' coins,
+      pacMan = update' pacMan,
+      ghosts = (update' blinky, update' pinky, update' inky, update' clyde),
+      grid = update' grid
     }
     where
-      u :: Updateable a => a -> a
-      u = update gameState dt
+      update' :: Updateable a => a -> a
+      update' = update gameState dt
 
       coinIsEaten :: Coin -> Bool
       coinIsEaten Coin { stateCoin = Eaten } = True
@@ -61,6 +73,18 @@ step dt gameState@GameState { gameMode = Playing, elapsedTime, lives, level, coi
       } = roundVec2 (pointToCell $ positionPacMan pacMan) == roundVec2 (pointToCell positionGhost)
       die _ = False
 
+      currentMovementModeProgress :: MovementModeProgress
+      currentMovementModeProgress = case levelProgress of
+        StepLevel movementMode _ _ -> movementMode
+        FinalLevel movementMode _  -> movementMode
+
+      nextLevelProgress :: LevelProgress
+      nextMovementModeProgress :: MovementModeProgress
+      nextPowerUpDuration :: Float
+      (nextLevelProgress, nextMovementModeProgress, nextPowerUpDuration) = case levelProgress of
+        levelProgress'@(StepLevel movementMode powerUpDuration _) -> (levelProgress', movementMode, powerUpDuration)
+        levelProgress'@(FinalLevel movementMode powerUpDuration)  -> (levelProgress', movementMode, powerUpDuration)
+
 step _ gameState = return gameState
 
 updateCoins :: Float -> GameState -> GameState
@@ -69,6 +93,7 @@ updateCoins _ gameState@GameState {
   powerUpTimer,
   coins,
   score,
+  powerUpDuration,
   ghosts = (blinky, pinky, inky, clyde)
 } = case partition isEaten coins of
   (left, right) -> case any isPowerUp left of
@@ -76,7 +101,7 @@ updateCoins _ gameState@GameState {
       score = score + countScore left,
       coins = map (\coin -> coin { stateCoin = Eaten }) left ++ right,
       powerUpTimer = if atePowerUp
-        then 10
+        then powerUpDuration
         else powerUpTimer,
       ghosts = if atePowerUp
         then (frightenGhost blinky, frightenGhost pinky, frightenGhost inky, frightenGhost clyde)
@@ -104,11 +129,11 @@ updateCoins _ gameState@GameState {
     countScore (Coin { typeCoin = Regular } : xs) = 10 + countScore xs
 
 updateGhostMovementProgress :: Float -> GameState -> GameState
-updateGhostMovementProgress _ gameState@GameState { ghostMovementProgress = (Final _) } = gameState
-updateGhostMovementProgress dt gameState@GameState { ghostMovementProgress = (Step mode time next) } = gameState {
+updateGhostMovementProgress _ gameState@GameState { ghostMovementProgress = (FinalMovement _) } = gameState
+updateGhostMovementProgress dt gameState@GameState { ghostMovementProgress = (StepMovement mode time next) } = gameState {
   ghostMovementProgress = if newTime < 0
     then next
-    else Step mode newTime next
+    else StepMovement mode newTime next
 }
   where
     newTime :: Float
@@ -142,13 +167,13 @@ input (EventKey (SpecialKey key) Down _ _) gameState@GameState {
   ghosts = (blinky, pinky, inky, clyde),
   grid
 } = return $ gameState {
-  coins = map k coins,
-  pacMan = k pacMan,
-  ghosts = (k blinky, k pinky, k inky, k clyde),
-  grid = k grid
+  coins = map keyDown' coins,
+  pacMan = keyDown' pacMan,
+  ghosts = (keyDown' blinky, keyDown' pinky, keyDown' inky, keyDown' clyde),
+  grid = keyDown' grid
 }
   where
-    k :: Updateable a => a -> a
-    k = keyDown gameState key
+    keyDown' :: Updateable a => a -> a
+    keyDown' = keyDown gameState key
 
 input _ gameState = return gameState

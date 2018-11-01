@@ -128,8 +128,8 @@ instance Updateable Ghost where
 
       movementMode :: MovementMode
       movementMode = case ghostMovementProgress gameState of
-        Step movementMode' _ _ -> movementMode'
-        Final movementMode'    -> movementMode'
+        StepMovement movementMode' _ _ -> movementMode'
+        FinalMovement movementMode'    -> movementMode'
 
       wallObjects :: [Cell]
       wallObjects = case frightenedGhost ghost of

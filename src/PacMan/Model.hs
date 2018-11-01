@@ -4,26 +4,61 @@ module PacMan.Model where
 import Data.Maybe
 import PacMan.Helper
 
+-- State of the game
 data State = Playing | Paused
+
+-- Movement modes of Ghosts
+data MovementMode = Scatter | Chase
+
 -- data type to store alternating of movement of ghosts
 -- for instance, during the first level the movement mode of the ghots is
 -- Scatter for 7 seconds, then Chase for 20 seconds.
 -- Scatter for 7 seconds, then Chase for 20 seconds.
 -- Scatter for 5 seconds, then Chase for 20 seconds.
 -- Scatter for 5 seconds, then switch to Chase mode permanently.
-data MovementMode = Scatter | Chase
+data MovementModeProgress = StepMovement MovementMode Float MovementModeProgress | FinalMovement MovementMode
 
-data MovementModeProgress = Step MovementMode Float MovementModeProgress | Final MovementMode
+-- Describe the movement mode progress and power up duration for each level
+data LevelProgress = StepLevel MovementModeProgress Float LevelProgress | FinalLevel MovementModeProgress Float
+
+defaultLevelProgress :: LevelProgress
+defaultLevelProgress = StepLevel
+  (
+    StepMovement Scatter 7 $ -- Scatter for 7 sec
+    StepMovement Chase 20 $ -- Chase for 20 sec etc
+    StepMovement Scatter 7 $
+    StepMovement Chase 20 $
+    StepMovement Scatter 5 $
+    StepMovement Chase 20 $
+    StepMovement Scatter 5 $
+    FinalMovement Chase -- Chase for the remainder of the level
+  ) 10 -- power up duration of 10s for level 1
+  $ flip (foldr id) (replicate 3 $ StepLevel ( -- repeat level settings 3 times
+    StepMovement Scatter 7 $
+    StepMovement Chase 20 $
+    StepMovement Scatter 7 $
+    StepMovement Chase 20 $
+    StepMovement Scatter 5 $
+    StepMovement Chase 1033 $
+    StepMovement Scatter 1 $
+    FinalMovement Chase
+  ) 5) -- power up duration of 5 sec for level 2 to 5
+  $ FinalLevel ( -- level settings for level 5 and up
+    StepMovement Scatter 5 $
+    StepMovement Chase 20 $
+    StepMovement Scatter 5 $
+    StepMovement Chase 20 $
+    StepMovement Scatter 5 $
+    StepMovement Chase 1037 $
+    StepMovement Scatter 1 $
+    FinalMovement Chase
+  ) 3
+
 defaultMovementModeProgress :: MovementModeProgress
-defaultMovementModeProgress =
-  Step Scatter 7 $
-  Step Chase 20 $
-  Step Scatter 7 $
-  Step Chase 20 $
-  Step Scatter 5 $
-  Step Chase 20 $
-  Step Scatter 5 $
-  Final Chase
+defaultPowerUpDuration :: Float
+(defaultMovementModeProgress, defaultPowerUpDuration) = case defaultLevelProgress of
+  StepLevel movementMode powerUpDuration _ -> (movementMode, powerUpDuration)
+  FinalLevel movementMode powerUpDuration  -> (movementMode, powerUpDuration)
 
 data GameState = GameState {
   gameMode :: State,
@@ -32,6 +67,8 @@ data GameState = GameState {
   score :: Int,
   level :: Int,
   lives :: Int,
+  levelProgress :: LevelProgress,
+  powerUpDuration :: Float,
   ghostMovementProgress :: MovementModeProgress,
   grid :: Grid,
   pacMan :: PacMan,
@@ -94,6 +131,8 @@ defaultGhosts = (
 initialState :: String -> GameState
 initialState tiles = GameState Playing
   0 0 0 0 3
+  defaultLevelProgress
+  defaultPowerUpDuration
   defaultMovementModeProgress
   (Grid tiles)
   defaultPacMan

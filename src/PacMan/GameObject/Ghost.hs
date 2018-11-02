@@ -4,45 +4,47 @@ module PacMan.GameObject.Ghost where
 
 import Data.Maybe
 import Data.List
-import Data.Fixed
 import Graphics.Gloss.Data.Picture
 import PacMan.Model
 import PacMan.Helper
 import PacMan.Class.Renderable
 import PacMan.Class.Updateable
+import System.Random
 
 instance Renderable Ghost where
-  render sprite GameState { powerUpTimer } ghost = uncurry translate (pointToScreen $ positionGhost ghost) $ tilePosition sprite
+  render sprite StateGame { powerUpTimer } ghost = uncurry translate (pointToScreen $ positionGhost ghost) $ spriteSection tilePosition sprite
     where
       tilePosition = case (blink, frightenedGhost ghost, directionGhost ghost, behaviourGhost ghost) of
-        (False,  Frightened, West,  _)      -> spriteSection (0,  11)
-        (False,  Frightened, East,  _)      -> spriteSection (1,  11)
-        (False,  Frightened, South, _)      -> spriteSection (2,  11)
-        (False,  Frightened, North, _)      -> spriteSection (3,  11)
-        (_,      Homing,     West,  _)      -> spriteSection (8,  12)
-        (_,      Homing,     East,  _)      -> spriteSection (9,  12)
-        (_,      Homing,     South, _)      -> spriteSection (10, 12)
-        (_,      Homing,     North, _)      -> spriteSection (11, 12)
-        (_,      _,          West,  Blinky) -> spriteSection (8,  11)
-        (_,      _,          East,  Blinky) -> spriteSection (9,  11)
-        (_,      _,          South, Blinky) -> spriteSection (10, 11)
-        (_,      _,          North, Blinky) -> spriteSection (11, 11)
-        (_,      _,          West,  Pinky)  -> spriteSection (4,  12)
-        (_,      _,          East,  Pinky)  -> spriteSection (5,  12)
-        (_,      _,          South, Pinky)  -> spriteSection (6,  12)
-        (_,      _,          North, Pinky)  -> spriteSection (7,  12)
-        (_,      _,          West,  Inky)   -> spriteSection (0,  12)
-        (_,      _,          East,  Inky)   -> spriteSection (1,  12)
-        (_,      _,          South, Inky)   -> spriteSection (2,  12)
-        (_,      _,          North, Inky)   -> spriteSection (3,  12)
-        (_,      _,          West,  Clyde)  -> spriteSection (4,  11)
-        (_,      _,          East,  Clyde)  -> spriteSection (5,  11)
-        (_,      _,          South, Clyde)  -> spriteSection (6,  11)
-        (_,      _,          North, Clyde)  -> spriteSection (7,  11)
+        (False,  Frightened, West,  _)      -> (0,  11)
+        (False,  Frightened, East,  _)      -> (1,  11)
+        (False,  Frightened, South, _)      -> (2,  11)
+        (False,  Frightened, North, _)      -> (3,  11)
+        (_,      Homing,     West,  _)      -> (8,  12)
+        (_,      Homing,     East,  _)      -> (9,  12)
+        (_,      Homing,     South, _)      -> (10, 12)
+        (_,      Homing,     North, _)      -> (11, 12)
+        (_,      _,          West,  Blinky) -> (8,  11)
+        (_,      _,          East,  Blinky) -> (9,  11)
+        (_,      _,          South, Blinky) -> (10, 11)
+        (_,      _,          North, Blinky) -> (11, 11)
+        (_,      _,          West,  Pinky)  -> (4,  12)
+        (_,      _,          East,  Pinky)  -> (5,  12)
+        (_,      _,          South, Pinky)  -> (6,  12)
+        (_,      _,          North, Pinky)  -> (7,  12)
+        (_,      _,          West,  Inky)   -> (0,  12)
+        (_,      _,          East,  Inky)   -> (1,  12)
+        (_,      _,          South, Inky)   -> (2,  12)
+        (_,      _,          North, Inky)   -> (3,  12)
+        (_,      _,          West,  Clyde)  -> (4,  11)
+        (_,      _,          East,  Clyde)  -> (5,  11)
+        (_,      _,          South, Clyde)  -> (6,  11)
+        (_,      _,          North, Clyde)  -> (7,  11)
         where
           -- blink if powerup timer is less then 2 seconds
           blink :: Bool
           blink = powerUpTimer < 2 && round (powerUpTimer * 5) `mod` 2 == 0
+
+  render _ _ _ = Blank
 
 instance Updateable Ghost where
   update gameState _ ghost@Ghost { spawnMode = NotSpawned } = ghost {
@@ -109,7 +111,7 @@ instance Updateable Ghost where
       direction' :: Direction
       direction'
         | maxMovement - movement < 0 = case frightenedGhost ghost of
-          Frightened    -> head possibleDirections
+          Frightened    -> possibleDirections !! fst (randomR (0, length possibleDirections - 1) (stdGen gameState))
           _             -> case sortBy sort' possibleDirections of
             (direction : _) -> direction
             _               -> error "no possible direction found"
@@ -172,7 +174,7 @@ instance Updateable Ghost where
           (width, height) = fromIntegralVec2 (size constructedCells)
 
       constructedCells :: [[Cell]]
-      constructedCells = constructCells $ tilesGrid $ grid gameState
+      constructedCells = constructCells $ gameMap $ grid gameState
 
       getGrid :: Vec2 -> Cell
       getGrid position = gridElement constructedCells (roundVec2 $ pointToCell position)

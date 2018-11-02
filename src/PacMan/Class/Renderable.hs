@@ -5,4 +5,4 @@ import Graphics.Gloss.Data.Picture
 import PacMan.Model
 
 class Renderable a where
-  render :: BitmapData -> GameState -> a -> Picture
+  render :: BitmapData -> State -> a -> Picture

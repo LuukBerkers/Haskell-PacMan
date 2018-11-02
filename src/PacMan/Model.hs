@@ -1,11 +1,10 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
 module PacMan.Model where
+
 import Data.Maybe
 import PacMan.Helper
-
--- State of the game
-data State = Playing | Paused
+import System.Random
 
 -- Movement modes of Ghosts
 data MovementMode = Scatter | Chase
@@ -60,22 +59,6 @@ defaultPowerUpDuration :: Float
   StepLevel movementMode powerUpDuration _ -> (movementMode, powerUpDuration)
   FinalLevel movementMode powerUpDuration  -> (movementMode, powerUpDuration)
 
-data GameState = GameState {
-  gameMode :: State,
-  elapsedTime :: Float,
-  powerUpTimer :: Float,
-  score :: Int,
-  level :: Int,
-  lives :: Int,
-  levelProgress :: LevelProgress,
-  powerUpDuration :: Float,
-  ghostMovementProgress :: MovementModeProgress,
-  grid :: Grid,
-  pacMan :: PacMan,
-  ghosts :: (Ghost, Ghost, Ghost, Ghost),
-  coins :: [Coin]
-}
-
 data PacMan = PacMan {
   elapsedPath :: Float,
   positionPacMan :: Vec2,
@@ -94,10 +77,10 @@ data Coin = Coin {
   positionCoin :: Vec2
 }
 defaultCoins :: String -> [Coin]
-defaultCoins tiles = mapMaybe convert $ zip coords $ concat $ constructCells tiles
+defaultCoins gameMap' = mapMaybe convert $ zip coords $ concat $ constructCells gameMap'
   where
     coords :: [Vec2]
-    coords = case size $ constructCells tiles of
+    coords = case size $ constructCells gameMap' of
       (width, height) -> [fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
     convert :: (Vec2, Cell) -> Maybe Coin
@@ -106,7 +89,7 @@ defaultCoins tiles = mapMaybe convert $ zip coords $ concat $ constructCells til
     convert _                    = Nothing
 
 data Grid = Grid {
-  tilesGrid :: String
+  gameMap :: String
 }
 
 data GhostBehaviour = Clyde | Pinky | Inky | Blinky
@@ -128,13 +111,45 @@ defaultGhosts = (
     Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde NotFrightened NotSpawned
   )
 
-initialState :: String -> GameState
-initialState tiles = GameState Playing
-  0 0 0 0 3
-  defaultLevelProgress
-  defaultPowerUpDuration
-  defaultMovementModeProgress
-  (Grid tiles)
-  defaultPacMan
-  defaultGhosts
-  (defaultCoins tiles)
+-- State of the game
+data GameState = Playing | Paused
+data MainMenuSelect = MainMenuStart | MainMenuHighscores
+
+-- Data type to store the actual game state
+data State = StateGame {
+  gameMode :: GameState,
+  stdGen :: StdGen,
+  elapsedTime :: Float,
+  powerUpTimer :: Float,
+  score :: Int,
+  level :: Int,
+  lives :: Int,
+  levelProgress :: LevelProgress,
+  powerUpDuration :: Float,
+  ghostMovementProgress :: MovementModeProgress,
+  grid :: Grid,
+  pacMan :: PacMan,
+  ghosts :: (Ghost, Ghost, Ghost, Ghost),
+  coins :: [Coin]
+} | StateMainMenu {
+  selected :: MainMenuSelect
+}
+
+defaultGame :: IO State
+defaultGame = do
+  gameMap' <- readFile "data/level.txt"
+  stdGen'  <- getStdGen
+  return $ StateGame
+    Playing
+    stdGen'
+    0 0 0 0 3
+    defaultLevelProgress
+    defaultPowerUpDuration
+    defaultMovementModeProgress
+    (Grid gameMap')
+    defaultPacMan
+    defaultGhosts
+    (defaultCoins gameMap')
+
+defaultMainMenu :: IO State
+defaultMainMenu = return $ StateMainMenu MainMenuStart

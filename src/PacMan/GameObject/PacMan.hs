@@ -73,7 +73,7 @@ instance Updateable PacMan where
       canMove dir = gridElement constructedCells (roundVec2 $ pointToCell (positionPacMan pacMan) =+= getDirVec dir) `notElem` [Wall, GhostHouse]
 
       constructedCells :: [[Cell]]
-      constructedCells = constructCells $ tilesGrid $ grid gameState
+      constructedCells = constructCells $ gameMap $ grid gameState
 
       gridSize :: Vec2
       gridSize = tileToPoint $ fromIntegralVec2 $ size constructedCells

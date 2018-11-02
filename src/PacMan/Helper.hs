@@ -5,10 +5,9 @@ import Codec.BMP
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
 
-tileWidth, tileHeight, fps :: Int
+tileWidth, tileHeight :: Int
 tileWidth = 20
 tileHeight = 20
-fps = 60
 
 data Direction = North | East | South | West deriving (Show, Eq)
 data Cell = Wall | CoinCell | PowerUpCell | Empty | GhostHouse deriving (Show, Eq)

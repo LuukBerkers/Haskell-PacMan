@@ -13,7 +13,7 @@ instance Renderable Grid where
       coords = [tileToScreen $ fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
       connectWalls :: [Picture]
-      connectWalls = loopY $ pad $ constructCells $ tilesGrid grid
+      connectWalls = loopY $ pad $ constructCells $ gameMap grid
 
       loopY :: [[Cell]] -> [Picture]
       loopY ((_ : t) : c : bs@(_ : b) : ys) = loopX t c b ++ loopY (c : bs : ys)
@@ -43,10 +43,10 @@ instance Renderable Grid where
       connectWall _    _    _    _    _    = Blank
 
       pad :: [[Cell]] -> [[Cell]]
-      pad tiles = addToStartAndEnd (replicate (width + 2) Empty) $ map (addToStartAndEnd Empty) tiles
+      pad gameMap' = addToStartAndEnd (replicate (width + 2) Empty) $ map (addToStartAndEnd Empty) gameMap'
 
       width, height :: Int
-      (width, height) = size $ lines $ tilesGrid grid
+      (width, height) = size $ lines $ gameMap grid
 
 instance Updateable Grid where
   update  _ _ a = a

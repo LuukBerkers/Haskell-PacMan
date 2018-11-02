@@ -21,6 +21,8 @@ executable PacMan
                        PacMan.Helper,
                        PacMan.Model,
                        PacMan.View,
+                       PacMan.StateGame,
+                       PacMan.StateMainMenu,
                        PacMan.GameObject.Coin,
                        PacMan.GameObject.Ghost,
                        PacMan.GameObject.PacMan,

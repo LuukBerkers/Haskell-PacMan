@@ -24,7 +24,8 @@ step :: Float -> State -> IO State
 step _ = return
 
 input :: Event -> State -> IO State
-input (EventKey (SpecialKey KeyEnter) Down _ _) StateMainMenu { selected = MainMenuStart } = defaultGame
+input (EventKey (SpecialKey KeyEnter) Down _ _) StateMainMenu { selected = MainMenuStart }      = defaultGame
+input (EventKey (SpecialKey KeyEnter) Down _ _) StateMainMenu { selected = MainMenuHighscores } = defaultHighscore
 input (EventKey (SpecialKey KeyDown)  Down _ _) gameState@StateMainMenu { selected = MainMenuStart } = return $ gameState { selected = MainMenuHighscores }
 input (EventKey (SpecialKey KeyDown)  Down _ _) gameState@StateMainMenu { selected = MainMenuHighscores } = return $ gameState { selected = MainMenuStart }
 input (EventKey (SpecialKey KeyUp)    Down _ _) gameState@StateMainMenu { selected = MainMenuStart } = return $ gameState { selected = MainMenuHighscores }

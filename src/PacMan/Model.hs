@@ -3,8 +3,10 @@
 module PacMan.Model where
 
 import Data.Maybe
-import PacMan.Helper
+import Data.Text (Text)
 import System.Random
+import PacMan.Helper
+import PacMan.HighscoreHelper
 
 -- Movement modes of Ghosts
 data MovementMode = Scatter | Chase
@@ -145,6 +147,8 @@ data State = StateGame {
   name :: String,
   charSelected :: Int,
   highscore :: Int
+} | StateHighscores {
+  highscores :: [Score]
 }
 
 defaultGameMode :: GameMode
@@ -179,10 +183,11 @@ defaultGame = StateGame <$>
   defaultGhosts <*>
   defaultCoins
 
-defaultMainMenu :: IO State
-defaultMainMenu = return $ StateMainMenu MainMenuStart
 defaultMainMenu :: State
 defaultMainMenu = StateMainMenu MainMenuStart
 
 defaultEnterHighscore :: Int -> State
 defaultEnterHighscore = StateEnterHighscore (replicate 3 'A') 0
+
+defaultHighscore :: IO State
+defaultHighscore = StateHighscores <$> readHighscores

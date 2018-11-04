@@ -2,12 +2,17 @@
 
 module PacMan.StateEnterHighscore where
 
+import Data.Aeson
 import Data.Char
+import Data.ByteString.Lazy.Char8 (unpack)
+import Data.Text (pack)
+import Data.List
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Color
 import Graphics.Gloss.Data.Bitmap
 import Graphics.Gloss.Interface.IO.Game
 import PacMan.Model
+import PacMan.HighscoreHelper
 
 view :: BitmapData -> State -> Picture
 view _ StateEnterHighscore { highscore, name, charSelected } = pictures $
@@ -37,7 +42,11 @@ input (EventKey (SpecialKey KeyDown) Down _ _) gameState@StateEnterHighscore { c
 input (EventKey (SpecialKey KeyUp) Down _ _) gameState@StateEnterHighscore { charSelected, name } = return gameState {
   name = changeIndex charSelected (nextChar (name !! charSelected)) name
 }
-input (EventKey (SpecialKey KeyEnter) Down _ _) gameState@StateEnterHighscore { highscore, name } = return gameState
+-- TODO use appicative?
+input (EventKey (SpecialKey KeyEnter) Down _ _) StateEnterHighscore { highscore, name } = do
+  highscores <- readHighscores
+  _ <- writeHighscore $ addScore (Score (pack name) highscore) highscores
+  defaultHighscore
 input _ state = return state
 
 nextChar :: Char -> Char

@@ -19,18 +19,20 @@ executable PacMan
   -- other-extensions:
   other-modules:       PacMan.Controller,
                        PacMan.Helper,
+                       PacMan.HighscoreHelper,
                        PacMan.Model,
                        PacMan.View,
                        PacMan.StateGame,
                        PacMan.StateMainMenu,
                        PacMan.StateEnterHighscore,
+                       PacMan.StateHighscores,
                        PacMan.GameObject.Coin,
                        PacMan.GameObject.Ghost,
                        PacMan.GameObject.PacMan,
                        PacMan.GameObject.Grid,
                        PacMan.Class.Renderable,
                        PacMan.Class.Updateable
-  build-depends:       base >=4.11 && <4.12, gloss, bmp, strict, random
+  build-depends:       base >=4.11 && <4.12, gloss, bmp, strict, random, aeson, text, bytestring
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -Wall

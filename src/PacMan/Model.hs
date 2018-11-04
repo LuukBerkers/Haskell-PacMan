@@ -3,7 +3,6 @@
 module PacMan.Model where
 
 import Data.Maybe
-import Data.Text (Text)
 import System.Random
 import PacMan.Helper
 import PacMan.HighscoreHelper

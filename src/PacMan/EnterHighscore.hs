@@ -2,11 +2,8 @@
 
 module PacMan.EnterHighscore where
 
-import Data.Aeson
 import Data.Char
-import Data.ByteString.Lazy.Char8 (unpack)
 import Data.Text (pack)
-import Data.List
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Color
 import Graphics.Gloss.Data.Bitmap
@@ -19,7 +16,7 @@ view _ EnterHighscore { highscore, name, charSelected } = pictures $
   (translate (-150) 300    . scale 0.3 0.3 . color white . Text) "Your score was" :
   (translate (-250) (-300) . scale 0.3 0.3 . color white . Text) "Press ENTER to continue" :
   (translate (-180) 180 .                    color white . Text . show) highscore :
-  zipWith3 (\char translate color -> translate (color char)) chars translations colors
+  zipWith3 (\char translate' color' -> translate' (color' char)) chars translations colors
   where
     chars = map (Text . pure) name
     translations = map (\x -> translate (fromIntegral x * 140 - 320) (-50)) [1 .. length name]

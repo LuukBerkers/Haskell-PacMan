@@ -120,9 +120,7 @@ instance Updateable Ghost where
         | otherwise = (directionGhost ghost, stdGen ghost)
         where
           sort' :: Direction -> Direction -> Ordering
-          sort' a b
-            | distanceToDirection a > distanceToDirection b = GT
-            | otherwise = LT
+          sort' a b = compare (distanceToDirection a) (distanceToDirection b)
 
           distanceToDirection :: Direction -> Float
           distanceToDirection direction = lengthVec2 $ pointToCell (positionGhost ghost) =+= getDirVec direction =-= targetCell

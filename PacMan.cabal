@@ -23,6 +23,7 @@ executable PacMan
                        PacMan.View,
                        PacMan.StateGame,
                        PacMan.StateMainMenu,
+                       PacMan.StateEnterHighscore,
                        PacMan.GameObject.Coin,
                        PacMan.GameObject.Ghost,
                        PacMan.GameObject.PacMan,

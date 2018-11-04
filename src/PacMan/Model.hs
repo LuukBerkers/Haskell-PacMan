@@ -141,6 +141,10 @@ data State = StateGame {
   coins :: [Coin]
 } | StateMainMenu {
   selected :: MainMenuSelect
+} | StateEnterHighscore {
+  name :: String,
+  charSelected :: Int,
+  highscore :: Int
 }
 
 defaultGameMode :: GameMode
@@ -177,3 +181,8 @@ defaultGame = StateGame <$>
 
 defaultMainMenu :: IO State
 defaultMainMenu = return $ StateMainMenu MainMenuStart
+defaultMainMenu :: State
+defaultMainMenu = StateMainMenu MainMenuStart
+
+defaultEnterHighScore :: Int -> State
+defaultEnterHighScore = StateEnterHighscore (replicate 3 'A') 0

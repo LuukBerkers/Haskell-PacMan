@@ -51,6 +51,7 @@ step :: Float -> State -> IO State
 -- if gameState = Playing update every GameObject
 step dt gameState@StateGame {
   gameMode = Playing,
+  score,
   elapsedTime,
   levelProgress,
   lives,
@@ -76,7 +77,7 @@ step dt gameState@StateGame {
     }
   -- Check if Pac-Man died
   | die blinky || die pinky || die inky || die clyde = case lives - 1 of
-    0      -> defaultMainMenu
+    0      -> return $ defaultEnterHighScore score
     lives' -> do
       defaultGhosts' <- defaultGhosts
       return gameState {

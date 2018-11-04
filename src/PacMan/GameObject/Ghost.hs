@@ -71,6 +71,7 @@ instance Updateable Ghost where
       (getDirVec (directionGhost ghost) =*- movementCurrentDirection) =+=
       (getDirVec direction' =*- movementNextDirection) =+= gridSize) =%= gridSize,
     directionGhost = direction',
+    stdGen = stdGen',
     frightenedGhost = frightened
   }
     where
@@ -109,13 +110,14 @@ instance Updateable Ghost where
       movementNextDirection = movement - movementCurrentDirection
 
       direction' :: Direction
-      direction'
+      (direction', stdGen')
         | maxMovement - movement < 0 = case frightenedGhost ghost of
-          Frightened    -> possibleDirections !! fst (randomR (0, length possibleDirections - 1) (stdGen gameState))
+          Frightened    -> case randomR (0, length possibleDirections - 1) (stdGen ghost) of
+            (i, gen) -> (possibleDirections !! i, gen)
           _             -> case sortBy sort' possibleDirections of
-            (direction : _) -> direction
+            (direction : _) -> (direction, stdGen ghost)
             _               -> error "no possible direction found"
-        | otherwise = directionGhost ghost
+        | otherwise = (directionGhost ghost, stdGen ghost)
         where
           sort' :: Direction -> Direction -> Ordering
           sort' a b

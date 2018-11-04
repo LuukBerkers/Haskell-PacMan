@@ -20,6 +20,7 @@ data MovementModeProgress = StepMovement MovementMode Float MovementModeProgress
 -- Describe the movement mode progress and power up duration for each level
 data LevelProgress = StepLevel MovementModeProgress Float LevelProgress | FinalLevel MovementModeProgress Float
 
+-- Level progress for Pac-Man
 defaultLevelProgress :: LevelProgress
 defaultLevelProgress = StepLevel
   (
@@ -76,11 +77,13 @@ data Coin = Coin {
   typeCoin :: CoinType,
   positionCoin :: Vec2
 }
-defaultCoins :: String -> [Coin]
-defaultCoins gameMap' = mapMaybe convert $ zip coords $ concat $ constructCells gameMap'
+defaultCoins :: IO [Coin]
+defaultCoins = do
+  gameMap' <- readFile "data/level.txt"
+  return $ mapMaybe convert $ zip (coords gameMap') $ concat $ constructCells gameMap'
   where
-    coords :: [Vec2]
-    coords = case size $ constructCells gameMap' of
+    coords :: String -> [Vec2]
+    coords gameMap' = case size $ constructCells gameMap' of
       (width, height) -> [fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
     convert :: (Vec2, Cell) -> Maybe Coin
@@ -101,24 +104,29 @@ data Ghost = Ghost {
   speedGhost :: Float,
   behaviourGhost :: GhostBehaviour,
   frightenedGhost :: FrightenedMode,
-  spawnMode :: SpawnMode
+  spawnMode :: SpawnMode,
+  stdGen :: StdGen
 }
-defaultGhosts :: (Ghost, Ghost, Ghost, Ghost)
-defaultGhosts = (
-    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened NotSpawned,
-    Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky NotFrightened NotSpawned,
-    Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky NotFrightened NotSpawned,
-    Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde NotFrightened NotSpawned
-  )
+defaultGhosts :: IO (Ghost, Ghost, Ghost, Ghost)
+defaultGhosts = do
+  stdGenBlinky <- newStdGen
+  stdGenPinky  <- newStdGen
+  stdGenInky   <- newStdGen
+  stdGenClyde  <- newStdGen
+  pure (
+      Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened NotSpawned stdGenBlinky,
+      Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  NotFrightened NotSpawned stdGenPinky,
+      Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   NotFrightened NotSpawned stdGenInky,
+      Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  NotFrightened NotSpawned stdGenClyde
+    )
 
 -- State of the game
-data GameState = Playing | Paused
+data GameMode = Playing | Paused
 data MainMenuSelect = MainMenuStart | MainMenuHighscores
 
 -- Data type to store the actual game state
 data State = StateGame {
-  gameMode :: GameState,
-  stdGen :: StdGen,
+  gameMode :: GameMode,
   elapsedTime :: Float,
   powerUpTimer :: Float,
   score :: Int,
@@ -135,21 +143,37 @@ data State = StateGame {
   selected :: MainMenuSelect
 }
 
+defaultGameMode :: GameMode
+defaultGameMode = Playing
+defaultElapsedTime :: Float
+defaultElapsedTime = 0
+defaultPowerUpTimer :: Float
+defaultPowerUpTimer = 0
+defaultScore :: Int
+defaultScore = 0
+defaultLevel :: Int
+defaultLevel =  0
+defaultLives :: Int
+defaultLives = 3
+
+defaultGrid :: IO Grid
+defaultGrid = Grid <$> readFile "data/level.txt"
+
 defaultGame :: IO State
-defaultGame = do
-  gameMap' <- readFile "data/level.txt"
-  stdGen'  <- getStdGen
-  return $ StateGame
-    Playing
-    stdGen'
-    0 0 0 0 3
-    defaultLevelProgress
-    defaultPowerUpDuration
-    defaultMovementModeProgress
-    (Grid gameMap')
-    defaultPacMan
-    defaultGhosts
-    (defaultCoins gameMap')
+defaultGame = StateGame <$>
+  return defaultGameMode <*>
+  return defaultElapsedTime <*>
+  return defaultPowerUpTimer <*>
+  return defaultScore <*>
+  return defaultLevel <*>
+  return defaultLives <*>
+  return defaultLevelProgress <*>
+  return defaultPowerUpDuration <*>
+  return defaultMovementModeProgress <*>
+  defaultGrid <*>
+  return defaultPacMan <*>
+  defaultGhosts <*>
+  defaultCoins
 
 defaultMainMenu :: IO State
 defaultMainMenu = return $ StateMainMenu MainMenuStart

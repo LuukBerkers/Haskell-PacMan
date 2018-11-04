@@ -60,28 +60,33 @@ step dt gameState@StateGame {
   ghosts = (blinky, pinky, inky, clyde), grid
 }
   -- If all coins are eaten, advance to next level
-  | all coinIsEaten coins = return gameState {
-    levelProgress = nextLevelProgress,                -- update level progress
-    ghostMovementProgress = nextMovementModeProgress, -- update movement mode progress
-    powerUpDuration = nextPowerUpDuration,            -- update power up duration
-    level = level + 1,                                -- increase level
-    elapsedTime = 0,                                  -- reset elapsed time
-    powerUpTimer = 0,                                 -- reset power up timer
-    pacMan = defaultPacMan,                           -- reset Pac-Man
-    ghosts = defaultGhosts,                           -- reset Ghosts
-    coins = defaultCoins $ gameMap grid               -- reset coins
-  }
+  | all coinIsEaten coins = do
+    defaultGhosts' <- defaultGhosts
+    defaultCoins'  <- defaultCoins
+    return gameState {
+      levelProgress = nextLevelProgress,                -- update level progress
+      ghostMovementProgress = nextMovementModeProgress, -- update movement mode progress
+      powerUpDuration = nextPowerUpDuration,            -- update power up duration
+      level = level + 1,                                -- increase level
+      elapsedTime = 0,                                  -- reset elapsed time
+      powerUpTimer = 0,                                 -- reset power up timer
+      pacMan = defaultPacMan,                           -- reset Pac-Man
+      ghosts = defaultGhosts',                          -- reset Ghosts
+      coins = defaultCoins'                             -- reset coins
+    }
   -- Check if Pac-Man died
   | die blinky || die pinky || die inky || die clyde = case lives - 1 of
     0      -> defaultMainMenu
-    lives' -> return $ gameState {
-      lives = lives',                                      -- decrease lives
-      ghostMovementProgress = currentMovementModeProgress, -- reset movement progress
-      powerUpTimer = 0,                                    -- reset power up timer
-      elapsedTime = 0,                                     -- reset elapsed time
-      ghosts = defaultGhosts,                              -- reset ghosts
-      pacMan = defaultPacMan                               -- reset Pac-Man
-    }
+    lives' -> do
+      defaultGhosts' <- defaultGhosts
+      return gameState {
+        lives = lives',                                      -- decrease lives
+        ghostMovementProgress = currentMovementModeProgress, -- reset movement progress
+        powerUpTimer = 0,                                    -- reset power up timer
+        elapsedTime = 0,                                     -- reset elapsed time
+        ghosts = defaultGhosts',                             -- reset ghosts
+        pacMan = defaultPacMan                               -- reset Pac-Man
+      }
   -- Update game
   | otherwise = return $
     updateGhostMovementProgress dt $

@@ -184,5 +184,5 @@ defaultMainMenu = return $ StateMainMenu MainMenuStart
 defaultMainMenu :: State
 defaultMainMenu = StateMainMenu MainMenuStart
 
-defaultEnterHighScore :: Int -> State
-defaultEnterHighScore = StateEnterHighscore (replicate 3 'A') 0
+defaultEnterHighscore :: Int -> State
+defaultEnterHighscore = StateEnterHighscore (replicate 3 'A') 0

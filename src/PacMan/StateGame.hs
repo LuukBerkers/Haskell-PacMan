@@ -77,7 +77,7 @@ step dt gameState@StateGame {
     }
   -- Check if Pac-Man died
   | die blinky || die pinky || die inky || die clyde = case lives - 1 of
-    0      -> return $ defaultEnterHighScore score
+    0      -> return $ defaultEnterHighscore score
     lives' -> do
       defaultGhosts' <- defaultGhosts
       return gameState {

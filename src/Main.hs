@@ -9,12 +9,14 @@ import PacMan.Helper (tileWidth, tileHeight, loadBitmapData)
 main :: IO ()
 main = do
   sprite <- loadBitmapData "data/sprite.bmp"
-  initialState <- defaultMainMenu
   playIO
     (InWindow "Pac-Man" (28 * tileWidth, 36 * tileHeight) (0, 0))
-    black         -- background color
-    60            -- fps
-    initialState  -- initial state (model)
-    (view sprite) -- render state, already pass sprite (view)
-    input         -- event handler (controller)
-    step          -- update handler for each frame (controller)
+    black           -- background color
+    60              -- fps
+    defaultMainMenu -- initial state (model)
+    (view sprite)   -- render state, already pass sprite (view)
+    input           -- event handler (controller)
+    step            -- update handler for each frame (controller)
+
+-- TODO
+-- rename StateGame etc to Game etc

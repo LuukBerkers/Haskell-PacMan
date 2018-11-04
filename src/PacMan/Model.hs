@@ -127,7 +127,7 @@ data GameMode = Playing | Paused
 data MainMenuSelect = MainMenuStart | MainMenuHighscores
 
 -- Data type to store the actual game state
-data State = StateGame {
+data State = Game {
   gameMode :: GameMode,
   elapsedTime :: Float,
   powerUpTimer :: Float,
@@ -141,13 +141,13 @@ data State = StateGame {
   pacMan :: PacMan,
   ghosts :: (Ghost, Ghost, Ghost, Ghost),
   coins :: [Coin]
-} | StateMainMenu {
+} | MainMenu {
   selected :: MainMenuSelect
-} | StateEnterHighscore {
+} | EnterHighscore {
   name :: String,
   charSelected :: Int,
   highscore :: Int
-} | StateHighscores {
+} | Highscores {
   highscores :: [Score]
 }
 
@@ -168,7 +168,7 @@ defaultGrid :: IO Grid
 defaultGrid = Grid <$> readFile "data/level.txt"
 
 defaultGame :: IO State
-defaultGame = StateGame <$>
+defaultGame = Game <$>
   return defaultGameMode <*>
   return defaultElapsedTime <*>
   return defaultPowerUpTimer <*>
@@ -184,10 +184,10 @@ defaultGame = StateGame <$>
   defaultCoins
 
 defaultMainMenu :: State
-defaultMainMenu = StateMainMenu MainMenuStart
+defaultMainMenu = MainMenu MainMenuStart
 
 defaultEnterHighscore :: Int -> State
-defaultEnterHighscore = StateEnterHighscore (replicate 3 'A') 0
+defaultEnterHighscore = EnterHighscore (replicate 3 'A') 0
 
 defaultHighscore :: IO State
-defaultHighscore = StateHighscores <$> readHighscores
+defaultHighscore = Highscores <$> readHighscores

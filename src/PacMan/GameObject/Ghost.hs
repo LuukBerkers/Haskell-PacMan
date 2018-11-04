@@ -12,7 +12,7 @@ import PacMan.Class.Updateable
 import System.Random
 
 instance Renderable Ghost where
-  render sprite StateGame { powerUpTimer } ghost = uncurry translate (pointToScreen $ positionGhost ghost) $ spriteSection tilePosition sprite
+  render sprite Game { powerUpTimer } ghost = uncurry translate (pointToScreen $ positionGhost ghost) $ spriteSection tilePosition sprite
     where
       tilePosition = case (blink, frightenedGhost ghost, directionGhost ghost, behaviourGhost ghost) of
         (False,  Frightened, West,  _)      -> (0,  11)

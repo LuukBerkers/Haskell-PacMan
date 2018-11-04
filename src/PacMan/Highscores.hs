@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module PacMan.StateHighscores where
+module PacMan.Highscores where
 
 import Data.Text (unpack)
 import Graphics.Gloss.Data.Picture
@@ -11,7 +11,7 @@ import PacMan.Model
 import PacMan.HighscoreHelper
 
 view :: BitmapData -> State -> Picture
-view _ StateHighscores { highscores } = pictures $
+view _ Highscores { highscores } = pictures $
   (translate (-150) 300    . scale 0.3 0.3 . color white . Text) "Highscores" :
   (translate (-250) (-300) . scale 0.3 0.3 . color white . Text) "Press ENTER continue" :
   concat (zipWith drawHighscores [1 .. 10] highscores)

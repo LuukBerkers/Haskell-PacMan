@@ -19,4 +19,4 @@ main = do
     step            -- update handler for each frame (controller)
 
 -- TODO
--- rename StateGame etc to Game etc
+-- rename Game etc to Game etc

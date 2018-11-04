@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module PacMan.StateGame where
+module PacMan.Game where
 
 import Data.List
 import Graphics.Gloss.Data.Picture
@@ -17,7 +17,7 @@ import PacMan.GameObject.PacMan()
 import PacMan.GameObject.Ghost()
 
 view :: BitmapData -> State -> Picture
-view sprite gameState@StateGame {
+view sprite gameState@Game {
   lives,
   level,
   score,
@@ -49,7 +49,7 @@ view _ _ = Blank
 
 step :: Float -> State -> IO State
 -- if gameState = Playing update every GameObject
-step dt gameState@StateGame {
+step dt gameState@Game {
   gameMode = Playing,
   score,
   elapsedTime,
@@ -130,7 +130,7 @@ step dt gameState@StateGame {
 step _ gameState = return gameState
 
 updateCoins :: Float -> State -> State
-updateCoins _ gameState@StateGame {
+updateCoins _ gameState@Game {
   pacMan,
   powerUpTimer,
   coins,
@@ -172,8 +172,8 @@ updateCoins _ gameState@StateGame {
 updateCoins _ gameState = gameState
 
 updateGhostMovementProgress :: Float -> State -> State
-updateGhostMovementProgress _  gameState@StateGame { ghostMovementProgress = (FinalMovement _) } = gameState
-updateGhostMovementProgress dt gameState@StateGame { ghostMovementProgress = (StepMovement mode time next) } = gameState {
+updateGhostMovementProgress _  gameState@Game { ghostMovementProgress = (FinalMovement _) } = gameState
+updateGhostMovementProgress dt gameState@Game { ghostMovementProgress = (StepMovement mode time next) } = gameState {
   ghostMovementProgress = if newTime < 0
     then next
     else StepMovement mode newTime next
@@ -184,7 +184,7 @@ updateGhostMovementProgress dt gameState@StateGame { ghostMovementProgress = (St
 updateGhostMovementProgress _  gameState = gameState
 
 updatePowerUpTimer :: Float -> State -> State
-updatePowerUpTimer _ gameState@StateGame { powerUpTimer = 0, ghosts = (blinky, pinky, inky, clyde) } = gameState {
+updatePowerUpTimer _ gameState@Game { powerUpTimer = 0, ghosts = (blinky, pinky, inky, clyde) } = gameState {
   ghosts = (unFrighten blinky, unFrighten pinky, unFrighten inky, unFrighten clyde)
 }
   where
@@ -193,7 +193,7 @@ updatePowerUpTimer _ gameState@StateGame { powerUpTimer = 0, ghosts = (blinky, p
     unFrighten ghost@Ghost { frightenedGhost = Frightened } = ghost { frightenedGhost = NotFrightened }
     unFrighten ghost = ghost
 
-updatePowerUpTimer dt gameState@StateGame { powerUpTimer } = gameState {
+updatePowerUpTimer dt gameState@Game { powerUpTimer } = gameState {
   -- count down powerup timer
   powerUpTimer = max 0 (powerUpTimer - dt)
 }
@@ -202,11 +202,11 @@ updatePowerUpTimer _ gameState = gameState
 
 input :: Event -> State -> IO State
 -- play pause logic
-input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@StateGame { gameMode = Playing } = return gameState { gameMode = Paused }
-input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@StateGame { gameMode = Paused } = return gameState { gameMode = Playing }
+input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@Game { gameMode = Playing } = return gameState { gameMode = Paused }
+input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@Game { gameMode = Paused } = return gameState { gameMode = Playing }
 
 -- emit special keys to all game objects
-input (EventKey (SpecialKey key) Down _ _) gameState@StateGame {
+input (EventKey (SpecialKey key) Down _ _) gameState@Game {
   gameMode = Playing,
   coins,
   pacMan,

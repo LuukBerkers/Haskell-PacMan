@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module PacMan.StateEnterHighscore where
+module PacMan.EnterHighscore where
 
 import Data.Aeson
 import Data.Char
@@ -15,7 +15,7 @@ import PacMan.Model
 import PacMan.HighscoreHelper
 
 view :: BitmapData -> State -> Picture
-view _ StateEnterHighscore { highscore, name, charSelected } = pictures $
+view _ EnterHighscore { highscore, name, charSelected } = pictures $
   (translate (-150) 300    . scale 0.3 0.3 . color white . Text) "Your score was" :
   (translate (-250) (-300) . scale 0.3 0.3 . color white . Text) "Press ENTER to continue" :
   (translate (-180) 180 .                    color white . Text . show) highscore :
@@ -30,20 +30,20 @@ step :: Float -> State -> IO State
 step _ = return
 
 input :: Event -> State -> IO State
-input (EventKey (SpecialKey KeyRight) Down _ _) gameState@StateEnterHighscore { charSelected, name } = return gameState {
+input (EventKey (SpecialKey KeyRight) Down _ _) gameState@EnterHighscore { charSelected, name } = return gameState {
   charSelected = (charSelected + 1) `mod` length name
 }
-input (EventKey (SpecialKey KeyLeft) Down _ _) gameState@StateEnterHighscore { charSelected, name } = return gameState {
+input (EventKey (SpecialKey KeyLeft) Down _ _) gameState@EnterHighscore { charSelected, name } = return gameState {
   charSelected = (charSelected - 1 + length name) `mod` length name
 }
-input (EventKey (SpecialKey KeyDown) Down _ _) gameState@StateEnterHighscore { charSelected, name } = return gameState {
+input (EventKey (SpecialKey KeyDown) Down _ _) gameState@EnterHighscore { charSelected, name } = return gameState {
   name = changeIndex charSelected (previousChar (name !! charSelected)) name
 }
-input (EventKey (SpecialKey KeyUp) Down _ _) gameState@StateEnterHighscore { charSelected, name } = return gameState {
+input (EventKey (SpecialKey KeyUp) Down _ _) gameState@EnterHighscore { charSelected, name } = return gameState {
   name = changeIndex charSelected (nextChar (name !! charSelected)) name
 }
 -- TODO use appicative?
-input (EventKey (SpecialKey KeyEnter) Down _ _) StateEnterHighscore { highscore, name } = do
+input (EventKey (SpecialKey KeyEnter) Down _ _) EnterHighscore { highscore, name } = do
   highscores <- readHighscores
   _ <- writeHighscore $ addScore (Score (pack name) highscore) highscores
   defaultHighscore

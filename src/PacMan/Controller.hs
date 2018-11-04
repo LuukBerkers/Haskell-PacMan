@@ -4,19 +4,19 @@ module PacMan.Controller where
 
 import Graphics.Gloss.Interface.IO.Game
 import PacMan.Model
-import qualified PacMan.StateGame           as StateGame
-import qualified PacMan.StateMainMenu       as StateMainMenu
-import qualified PacMan.StateEnterHighscore as StateEnterHighscore
-import qualified PacMan.StateHighscores     as StateHighscores
+import qualified PacMan.Game           as Game
+import qualified PacMan.MainMenu       as MainMenu
+import qualified PacMan.EnterHighscore as EnterHighscore
+import qualified PacMan.Highscores     as Highscores
 
 step :: Float -> State -> IO State
-step dt gameState@StateGame {}           = StateGame.step           dt gameState
-step dt gameState@StateMainMenu {}       = StateMainMenu.step       dt gameState
-step dt gameState@StateEnterHighscore {} = StateEnterHighscore.step dt gameState
-step dt gameState@StateHighscores {}     = StateHighscores.step dt gameState
+step dt gameState@Game {}           = Game.step           dt gameState
+step dt gameState@MainMenu {}       = MainMenu.step       dt gameState
+step dt gameState@EnterHighscore {} = EnterHighscore.step dt gameState
+step dt gameState@Highscores {}     = Highscores.step dt gameState
 
 input :: Event -> State -> IO State
-input event gameState@StateGame {}           = StateGame.input           event gameState
-input event gameState@StateMainMenu {}       = StateMainMenu.input       event gameState
-input event gameState@StateEnterHighscore {} = StateEnterHighscore.input event gameState
-input event gameState@StateHighscores {}     = StateHighscores.input event gameState
+input event gameState@Game {}           = Game.input           event gameState
+input event gameState@MainMenu {}       = MainMenu.input       event gameState
+input event gameState@EnterHighscore {} = EnterHighscore.input event gameState
+input event gameState@Highscores {}     = Highscores.input event gameState

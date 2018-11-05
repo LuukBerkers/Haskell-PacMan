@@ -3,7 +3,6 @@
 module PacMan.EnterHighscore where
 
 import Data.Char
-import Data.Text (pack)
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Color
 import Graphics.Gloss.Data.Bitmap
@@ -42,8 +41,10 @@ input (EventKey (SpecialKey KeyUp) Down _ _) gameState@EnterHighscore { charSele
 -- TODO use appicative?
 input (EventKey (SpecialKey KeyEnter) Down _ _) EnterHighscore { highscore, name } = do
   highscores <- readHighscores
-  _ <- writeHighscore $ addScore (Score (pack name) highscore) highscores
-  defaultHighscore
+  case addScore (Score name highscore) highscores of
+    (index, highscores') -> do
+      _ <- writeHighscore highscores'
+      defaultHighscore
 input _ state = return state
 
 nextChar :: Char -> Char

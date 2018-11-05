@@ -2,7 +2,6 @@
 
 module PacMan.Highscores where
 
-import Data.Text (unpack)
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Color
 import Graphics.Gloss.Data.Bitmap
@@ -18,7 +17,7 @@ view _ Highscores { highscores } = pictures $
   where
     drawHighscores i (Score playerName playerScore) = [
         (translate (-260) (i * (-40) + 240) . color white. scale 0.2 0.2 . Text . show . round) i,
-        (translate (-200) (i * (-40) + 240) . color white. scale 0.2 0.2 . Text . unpack) playerName,
+        (translate (-200) (i * (-40) + 240) . color white. scale 0.2 0.2 . Text) playerName,
         (translate 170 (i * (-40) + 240) . color white. scale 0.2 0.2 . Text . show) playerScore
       ]
 view _ _ = Blank

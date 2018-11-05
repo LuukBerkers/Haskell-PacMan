@@ -18,20 +18,6 @@ instance Ord Score where
   -- order is reverse because the highest scores are ranked higher
   (Score _ a) `compare` (Score _ b) = b `compare` a
 
--- add score to a list of scores
--- returns sorted highscores and the index of the new score
-addScore :: Score -> [Score] -> (Int, [Score])
-addScore score highscores = (index, highscores')
-  where
-    highscores' :: [Score]
-    highscores' = sort (score : highscores)
-
-    index :: Int
-    index = case elemIndex score highscores' of
-      Just index' -> index'
-      -- cannot happen because score is added to highscores'
-      _           -> error "cannot find index of score"
-
 -- Read and write scores with JSON format
 instance FromJSON Score where
   parseJSON = withObject "Score" $ \v -> Score <$> v .: "name" <*> v .: "score"
@@ -49,3 +35,17 @@ readHighscores = do
 
 writeHighscore :: [Score] -> IO ()
 writeHighscore = writeFile "data/highscores.json" . unpack . encode
+
+-- add score to a list of scores
+-- returns sorted highscores and the index of the new score
+addScore :: Score -> [Score] -> (Int, [Score])
+addScore score highscores = (index, highscores')
+  where
+    highscores' :: [Score]
+    highscores' = sort (score : highscores)
+
+    index :: Int
+    index = case elemIndex score highscores' of
+      Just index' -> index'
+      -- cannot happen because score is added to highscores'
+      _           -> error "cannot find index of score"

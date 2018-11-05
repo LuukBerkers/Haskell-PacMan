@@ -13,7 +13,7 @@ import PacMan.HighscoreHelper
 view :: BitmapData -> State -> Picture
 view _ Highscores { highscores } = pictures $
   (translate (-150) 300    . scale 0.3 0.3 . color white . Text) "Highscores" :
-  (translate (-250) (-300) . scale 0.3 0.3 . color white . Text) "Press ENTER continue" :
+  (translate (-250) (-300) . scale 0.3 0.3 . color white . Text) "Press ENTER to continue" :
   concat (zipWith drawHighscores [1 .. 10] highscores)
   where
     drawHighscores i (Score playerName playerScore) = [

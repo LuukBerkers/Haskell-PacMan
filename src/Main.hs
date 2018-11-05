@@ -1,10 +1,10 @@
 module Main where
 
 import Graphics.Gloss.Interface.IO.Game
-import PacMan.Controller (step, input)
+import PacMan.Controller
 import PacMan.Model
-import PacMan.View (view)
-import PacMan.Helper (tileWidth, tileHeight, loadBitmapData)
+import PacMan.View
+import PacMan.Helper
 
 main :: IO ()
 main = do

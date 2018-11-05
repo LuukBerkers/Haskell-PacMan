@@ -17,6 +17,3 @@ main = do
     (view sprite)   -- render state, already pass sprite (view)
     input           -- event handler (controller)
     step            -- update handler for each frame (controller)
-
--- TODO
--- rename Game etc to Game etc

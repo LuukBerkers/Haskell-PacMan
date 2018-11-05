@@ -29,7 +29,7 @@ executable PacMan
                        PacMan.GameObject.Coin,
                        PacMan.GameObject.Ghost,
                        PacMan.GameObject.PacMan,
-                       PacMan.GameObject.Grid,
+                       PacMan.GameObject.GameMap,
                        PacMan.Class.Renderable,
                        PacMan.Class.Updateable
   build-depends:       base >=4.11 && <4.12, gloss, bmp, strict, random, aeson, bytestring

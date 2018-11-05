@@ -12,7 +12,7 @@ import PacMan.Helper
 import PacMan.Class.Renderable
 import PacMan.Class.Updateable
 import PacMan.GameObject.Coin()
-import PacMan.GameObject.Grid()
+import PacMan.GameObject.GameMap()
 import PacMan.GameObject.PacMan()
 import PacMan.GameObject.Ghost()
 
@@ -29,22 +29,23 @@ view sprite gameState@Game {
   render' grid :
   map render' coins ++
   [render' pacMan, render' blinky, render' pinky, render' inky, render' clyde] ++
-  levelHeader : levelValue : scoreHeader : scoreValue : livesLeft -- UI elements
+  pauseText: levelHeader : levelValue : scoreHeader : scoreValue : livesLeft -- UI elements
   where
     render' :: Renderable a => a -> Picture
     render' = render sprite gameState
 
     scoreHeader, scoreValue, levelHeader, levelValue :: Picture
-    scoreHeader = drawText 13 (-2) "Score"
-    scoreValue = drawText 13 (-1) (show score)
-    levelHeader = drawText 1 (-2) "Level"
-    levelValue = drawText 1 (-1) (show (level + 1))
+    scoreHeader = drawText (-260) 340 "Score"
+    scoreValue  = drawText (-260) 320 (show score)
+    levelHeader = drawText (-10)  340 "Level"
+    levelValue  = drawText (-10)  320 (show (level + 1))
+    pauseText   = drawText 140    340 "Press ESC to pause"
 
     drawText :: Float -> Float -> String -> Picture
-    drawText x y = uncurry translate (tileToScreen (x, y)) . scale 0.1 0.1 . color white . Text
+    drawText x y = translate x y . scale 0.1 0.1 . color white . Text
 
     livesLeft :: [Picture]
-    livesLeft = map (\x -> uncurry translate (tileToScreen (fromIntegral x * 2, 31)) $ spriteSection (4, 9) sprite) [1..lives]
+    livesLeft = map (\x -> (translate (fromIntegral x * 40 - 260) (-330) . spriteSection (4, 9)) sprite) [0 .. (lives - 1)]
 view _ _ = Blank
 
 step :: Float -> State -> IO State

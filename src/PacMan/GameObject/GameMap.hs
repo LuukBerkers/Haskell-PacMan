@@ -1,4 +1,4 @@
-module PacMan.GameObject.Grid where
+module PacMan.GameObject.GameMap where
 
 import Graphics.Gloss.Data.Picture
 import PacMan.Model hiding (grid)
@@ -6,7 +6,7 @@ import PacMan.Helper
 import PacMan.Class.Renderable
 import PacMan.Class.Updateable
 
-instance Renderable Grid where
+instance Renderable GameMap where
   render sprite _ grid = pictures $ zipWith (uncurry translate) coords connectWalls
     where
       coords :: [Vec2]
@@ -48,6 +48,6 @@ instance Renderable Grid where
       width, height :: Int
       (width, height) = size $ lines $ gameMap grid
 
-instance Updateable Grid where
+instance Updateable GameMap where
   update  _ _ a = a
   keyDown _ _ a = a

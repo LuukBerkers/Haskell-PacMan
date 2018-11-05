@@ -80,7 +80,7 @@ data Coin = Coin {
 }
 defaultCoins :: IO [Coin]
 defaultCoins = do
-  gameMap' <- readFile "data/level.txt"
+  gameMap' <- readFile "data/gameMap.txt"
   return $ mapMaybe convert $ zip (coords gameMap') $ concat $ constructCells gameMap'
   where
     coords :: String -> [Vec2]
@@ -92,7 +92,7 @@ defaultCoins = do
     convert (coord, PowerUpCell) = Just $ Coin Alive PowerUp coord
     convert _                    = Nothing
 
-data Grid = Grid {
+newtype GameMap = GameMap {
   gameMap :: String
 }
 
@@ -114,7 +114,7 @@ defaultGhosts = do
   stdGenPinky  <- newStdGen
   stdGenInky   <- newStdGen
   stdGenClyde  <- newStdGen
-  pure (
+  return (
       Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened NotSpawned stdGenBlinky,
       Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  NotFrightened NotSpawned stdGenPinky,
       Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   NotFrightened NotSpawned stdGenInky,
@@ -136,7 +136,7 @@ data State = Game {
   levelProgress :: LevelProgress,
   powerUpDuration :: Float,
   ghostMovementProgress :: MovementModeProgress,
-  grid :: Grid,
+  grid :: GameMap,
   pacMan :: PacMan,
   ghosts :: (Ghost, Ghost, Ghost, Ghost),
   coins :: [Coin]
@@ -163,8 +163,8 @@ defaultLevel =  0
 defaultLives :: Int
 defaultLives = 3
 
-defaultGrid :: IO Grid
-defaultGrid = Grid <$> readFile "data/level.txt"
+defaultGameMap :: IO GameMap
+defaultGameMap = GameMap <$> readFile "data/gameMap.txt"
 
 defaultGame :: IO State
 defaultGame = Game <$>
@@ -177,7 +177,7 @@ defaultGame = Game <$>
   return defaultLevelProgress <*>
   return defaultPowerUpDuration <*>
   return defaultMovementModeProgress <*>
-  defaultGrid <*>
+  defaultGameMap <*>
   return defaultPacMan <*>
   defaultGhosts <*>
   defaultCoins

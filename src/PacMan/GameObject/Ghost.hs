@@ -77,7 +77,7 @@ instance Updateable Ghost where
     where
       frightened :: FrightenedMode
       frightened = case frightenedGhost ghost of
-        Homing | getGrid (positionGhost ghost) == GhostHouse -> NotFrightened
+        Homing | getGameMap (positionGhost ghost) == GhostHouse -> NotFrightened
         Frightened | roundVec2 (pointToCell $ positionPacMan $ pacMan gameState) == roundVec2 (pointToCell $ positionGhost ghost) -> Homing
         _ -> frightenedGhost ghost
 
@@ -135,13 +135,13 @@ instance Updateable Ghost where
 
       wallObjects :: [Cell]
       wallObjects = case frightenedGhost ghost of
-          NotFrightened | getGrid (positionGhost ghost) == GhostHouse -> [Wall]
+          NotFrightened | getGameMap (positionGhost ghost) == GhostHouse -> [Wall]
           NotFrightened                                               -> [Wall, GhostHouse]
           _                                                           -> [Wall]
 
       targetCell :: Vec2
       targetCell = case frightenedGhost ghost of
-          NotFrightened | getGrid (positionGhost ghost) == GhostHouse -> (13.5, 10)
+          NotFrightened | getGameMap (positionGhost ghost) == GhostHouse -> (13.5, 10)
           NotFrightened -> case movementMode of
             Scatter -> scatterModeTargetCell
             Chase -> case behaviourGhost ghost of
@@ -176,12 +176,12 @@ instance Updateable Ghost where
       constructedCells :: [[Cell]]
       constructedCells = constructCells $ gameMap $ grid gameState
 
-      getGrid :: Vec2 -> Cell
-      getGrid position = gridElement constructedCells (roundVec2 $ pointToCell position)
+      getGameMap :: Vec2 -> Cell
+      getGameMap position = gridElement constructedCells (roundVec2 $ pointToCell position)
 
       isDirectionWall :: Direction -> Maybe Direction
       isDirectionWall direction
-        | getGrid (positionGhost ghost =+= tileToPoint (getDirVec direction)) `elem` wallObjects = Nothing
+        | getGameMap (positionGhost ghost =+= tileToPoint (getDirVec direction)) `elem` wallObjects = Nothing
         | otherwise = Just direction
 
       gridSize :: Vec2

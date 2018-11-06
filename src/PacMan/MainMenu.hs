@@ -24,10 +24,10 @@ step :: Float -> State -> IO State
 step _ = return
 
 input :: Event -> State -> IO State
-input (EventKey (SpecialKey KeyEnter) Down _ _) MainMenu { selected = MainMenuStart }      = defaultGame
-input (EventKey (SpecialKey KeyEnter) Down _ _) MainMenu { selected = MainMenuHighscores } = defaultHighscore
-input (EventKey (SpecialKey KeyDown)  Down _ _) gameState@MainMenu { selected = MainMenuStart } = return $ gameState { selected = MainMenuHighscores }
-input (EventKey (SpecialKey KeyDown)  Down _ _) gameState@MainMenu { selected = MainMenuHighscores } = return $ gameState { selected = MainMenuStart }
-input (EventKey (SpecialKey KeyUp)    Down _ _) gameState@MainMenu { selected = MainMenuStart } = return $ gameState { selected = MainMenuHighscores }
-input (EventKey (SpecialKey KeyUp)    Down _ _) gameState@MainMenu { selected = MainMenuHighscores } = return $ gameState { selected = MainMenuStart }
+input (EventKey (SpecialKey KeyEnter) Down _ _) MainMenu { selected = MainMenuStart }                = defaultGame
+input (EventKey (SpecialKey KeyEnter) Down _ _) MainMenu { selected = MainMenuHighscores }           = defaultHighscore Nothing
+input (EventKey (SpecialKey KeyDown)  Down _ _) gameState@MainMenu { selected = MainMenuStart }      = return gameState { selected = MainMenuHighscores }
+input (EventKey (SpecialKey KeyDown)  Down _ _) gameState@MainMenu { selected = MainMenuHighscores } = return gameState { selected = MainMenuStart }
+input (EventKey (SpecialKey KeyUp)    Down _ _) gameState@MainMenu { selected = MainMenuStart }      = return gameState { selected = MainMenuHighscores }
+input (EventKey (SpecialKey KeyUp)    Down _ _) gameState@MainMenu { selected = MainMenuHighscores } = return gameState { selected = MainMenuStart }
 input _ gameState = return gameState

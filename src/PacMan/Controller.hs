@@ -13,10 +13,10 @@ step :: Float -> State -> IO State
 step dt gameState@Game {}           = Game.step           dt gameState
 step dt gameState@MainMenu {}       = MainMenu.step       dt gameState
 step dt gameState@EnterHighscore {} = EnterHighscore.step dt gameState
-step dt gameState@Highscores {}     = Highscores.step dt gameState
+step dt gameState@Highscores {}     = Highscores.step     dt gameState
 
 input :: Event -> State -> IO State
 input event gameState@Game {}           = Game.input           event gameState
 input event gameState@MainMenu {}       = MainMenu.input       event gameState
 input event gameState@EnterHighscore {} = EnterHighscore.input event gameState
-input event gameState@Highscores {}     = Highscores.input event gameState
+input event gameState@Highscores {}     = Highscores.input     event gameState

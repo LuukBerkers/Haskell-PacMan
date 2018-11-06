@@ -23,7 +23,7 @@ instance FromJSON Score where
   parseJSON = withObject "Score" $ \v -> Score <$> v .: "name" <*> v .: "score"
 
 instance ToJSON Score where
-  toJSON (Score name score) = object ["name" .= name, "score" .= score]
+  toJSON (Score name score)     = object ["name" .= name, "score" .= score]
   toEncoding (Score name score) = pairs ("name" .= name <> "score" .= score)
 
 readHighscores :: IO [Score]

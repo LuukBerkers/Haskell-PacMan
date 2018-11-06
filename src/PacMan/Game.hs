@@ -190,7 +190,7 @@ updatePowerUpTimer _ gameState@Game { powerUpTimer = 0, ghosts = (blinky, pinky,
 }
   where
     unFrighten :: Ghost -> Ghost
-    unFrighten ghost@Ghost { frightenedGhost = Homing } = ghost { frightenedGhost = NotFrightened }
+    unFrighten ghost@Ghost { frightenedGhost = Homing }     = ghost { frightenedGhost = NotFrightened }
     unFrighten ghost@Ghost { frightenedGhost = Frightened } = ghost { frightenedGhost = NotFrightened }
     unFrighten ghost = ghost
 

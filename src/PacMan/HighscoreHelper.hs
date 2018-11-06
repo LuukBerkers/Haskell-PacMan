@@ -15,6 +15,12 @@ data Score = Score {
 instance Ord Score where
   -- order is reverse because the highest scores are ranked higher
   (Score _ a) `compare` (Score _ b) = b `compare` a
+  (Score _ a) < (Score _ b)         = b < a
+  (Score _ a) <= (Score _ b)        = b <= a
+  (Score _ a) > (Score _ b)         = b > a
+  (Score _ a) >= (Score _ b)        = b >= a
+  -- max (Score _ a) (Score _ b)       = max a b
+  -- min (Score _ a) (Score _ b)       = min a b
 
 -- Read and write scores with JSON format
 instance FromJSON Score where

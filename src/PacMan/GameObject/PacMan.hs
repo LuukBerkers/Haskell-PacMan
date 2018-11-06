@@ -1,3 +1,4 @@
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TupleSections #-}
 
 module PacMan.GameObject.PacMan where
@@ -9,6 +10,7 @@ import PacMan.Model hiding (pacMan)
 import PacMan.Helper
 import PacMan.Class.Renderable
 import PacMan.Class.Updateable
+import PacMan.Class.Moveable
 
 instance Renderable PacMan where
   render sprite gameState pacMan = uncurry translate (pointToScreen $ positionPacMan pacMan) $ dirspriteSection sprite
@@ -17,7 +19,7 @@ instance Renderable PacMan where
       dirspriteSection = case map (, y) xs of
         -- pick frame from animation based on elapesedPath
         -- "!!" cannot fail because of mod length
-        animation -> spriteSection $ animation !! (round (elapsedPath pacMan / 30) `mod` length animation)
+        animation -> spriteSection $ animation !! (round (elapsedPath pacMan / 10) `mod` length animation)
         where
           y = case directionPacMan pacMan of
             North -> 7
@@ -29,54 +31,8 @@ instance Renderable PacMan where
             _ -> [0, 1, 2, 3, 2, 1]
 
 instance Updateable PacMan where
-  update gameState dt pacMan = pacMan {
-    elapsedPath = elapsedPath pacMan + maxMovement,
-    positionPacMan = (positionPacMan pacMan =+=
-      (getDirVec (directionPacMan pacMan) =*- movementCurrentDirection) =+=
-      (getDirVec direction' =*- movementNextDirection) =+= gridSize) =%= gridSize,
-    directionPacMan = direction'
-  }
-    where
-      movement :: Float
-      movement = speedPacMan pacMan * dt
-
-      maxMovement :: Float
-      maxMovement = case directionPacMan pacMan of
-        North -> y
-        East -> case x of
-          0 -> 0
-          _ -> width - x
-        South -> case y of
-          0 -> 0
-          _ -> height - y
-        West -> x
-        where
-          width, height, x, y :: Float
-          width = fromIntegral tileWidth
-          height = fromIntegral tileHeight
-          (x, y) = positionPacMan pacMan =%= (width, height)
-
-      movementCurrentDirection :: Float
-      movementCurrentDirection = min movement maxMovement
-
-      movementNextDirection :: Float
-      movementNextDirection
-        | canMove direction' = movement - movementCurrentDirection
-        | otherwise = 0
-
-      direction' :: Direction
-      direction'
-        | maxMovement - movement <= 0 && canMove (nextDirectionPacMan pacMan) = nextDirectionPacMan pacMan
-        | otherwise = directionPacMan pacMan
-
-      canMove :: Direction -> Bool
-      canMove dir = gridElement constructedCells (roundVec2 $ pointToCell (positionPacMan pacMan) =+= getDirVec dir) `notElem` [Wall, GhostHouse]
-
-      constructedCells :: [[Cell]]
-      constructedCells = (constructCells . gameMap . grid) gameState
-
-      gridSize :: Vec2
-      gridSize = tileToPoint $ fromIntegralVec2 $ size constructedCells
+  update Game { grid = GameMap { gameMap } } dt pacMan@PacMan { nextDirectionPacMan, directionPacMan } = move dt (constructCells gameMap) [nextDirectionPacMan, directionPacMan] pacMan
+  update _ _ pacMan = pacMan
 
   keyDown _ key pacMan = case getDirection of
     -- Pac-Man can always move backwards
@@ -84,9 +40,11 @@ instance Updateable PacMan where
       nextDirectionPacMan = nextDirection,
       directionPacMan = nextDirection
     }
+    -- set target direction of Pac-Man
     Just nextDirection -> pacMan {
       nextDirectionPacMan = nextDirection
     }
+    -- if key is not up, right, down or left do nothing
     Nothing -> pacMan
     where
       getDirection :: Maybe Direction

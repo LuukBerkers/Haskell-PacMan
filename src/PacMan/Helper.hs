@@ -1,5 +1,6 @@
 module PacMan.Helper where
 
+import System.Random
 import Data.Fixed
 import Codec.BMP
 import Graphics.Gloss.Data.Picture
@@ -82,8 +83,8 @@ lengthVec2 :: Vec2 -> Float
 lengthVec2 (x, y) = sqrt (x ** 2 + y ** 2)
 
 size :: [[a]] -> (Int, Int)
-size y@(x : _) = (fromIntegral $ length x, fromIntegral $ length y)
-size _ = (0, 0)
+size y@(x:_) = (length x, length y)
+size y       = (0,        length y)
 
 constructCells :: String -> [[Cell]]
 constructCells = map (map replace) . lines
@@ -121,3 +122,13 @@ loadBitmapData filePath = do
 
 addToStartAndEnd :: a -> [a] -> [a]
 addToStartAndEnd a list = a : list ++ [a]
+
+-- shuffles list
+shuffle :: StdGen -> [a] -> ([a], StdGen)
+shuffle stdGen []  = ([], stdGen)
+shuffle stdGen [x] = ([x], stdGen)
+shuffle stdGenA xs = (c : shuffle', stdGenC)
+  where
+    (index, stdGenB) = randomR (0, length xs - 1) stdGenA
+    (l, c:r) = splitAt index xs
+    (shuffle', stdGenC) = shuffle stdGenB (l ++ r)

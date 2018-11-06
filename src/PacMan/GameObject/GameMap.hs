@@ -1,19 +1,21 @@
+{-# LANGUAGE NamedFieldPuns #-}
+
 module PacMan.GameObject.GameMap where
 
 import Graphics.Gloss.Data.Picture
-import PacMan.Model hiding (grid)
+import PacMan.Model
 import PacMan.Helper
 import PacMan.Class.Renderable
 import PacMan.Class.Updateable
 
 instance Renderable GameMap where
-  render sprite _ grid = pictures $ zipWith (uncurry translate) coords connectWalls
+  render sprite _ GameMap { gameMap } = pictures $ zipWith (uncurry translate) coords connectWalls
     where
       coords :: [Vec2]
       coords = [tileToScreen $ fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
       connectWalls :: [Picture]
-      connectWalls = loopY $ pad $ constructCells $ gameMap grid
+      connectWalls = (loopY . pad . constructCells) gameMap
 
       loopY :: [[Cell]] -> [Picture]
       loopY ((_ : t) : c : bs@(_ : b) : ys) = loopX t c b ++ loopY (c : bs : ys)
@@ -46,7 +48,7 @@ instance Renderable GameMap where
       pad gameMap' = addToStartAndEnd (replicate (width + 2) Empty) (map (addToStartAndEnd Empty) gameMap')
 
       width, height :: Int
-      (width, height) = (size . lines . gameMap) grid
+      (width, height) = (size . lines) gameMap
 
 -- coin has no update functions
 -- fall back on default implementation of key down and update

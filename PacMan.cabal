@@ -31,7 +31,8 @@ executable PacMan
                        PacMan.GameObject.PacMan,
                        PacMan.GameObject.GameMap,
                        PacMan.Class.Renderable,
-                       PacMan.Class.Updateable
+                       PacMan.Class.Updateable,
+                       PacMan.Class.Moveable
   build-depends:       base >=4.11 && <4.12, gloss, bmp, strict, random, aeson, bytestring
   hs-source-dirs:      src
   default-language:    Haskell2010

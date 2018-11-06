@@ -157,7 +157,7 @@ instance Updateable Ghost where
               Clyde  -> pointToCell $ positionPacMan $ pacMan gameState
               -- Inky tries to be to the otherside of Pac-Man compared to Blinky
               Inky   -> pointToCell $ blinkyPosition =+= ((blinkyPosition =-= positionPacMan (pacMan gameState)) =*- 2)
-          -- Ghost is homing
+          -- Ghost is homing, target cell is ghost house
           _ -> (13.5, 13)
 
       blinkyPosition :: Vec2

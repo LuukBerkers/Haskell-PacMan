@@ -39,7 +39,10 @@ view sprite gameState@Game {
     scoreValue  = drawText (-260) 320 (show score)
     levelHeader = drawText (-10)  340 "Level"
     levelValue  = drawText (-10)  320 (show (level + 1))
-    pauseText   = drawText 140    340 "Press ESC to pause"
+    -- show different text based on
+    pauseText   = drawText 120    340 (case gameMode of
+      Playing -> "Press ESC to pause"
+      Paused  -> "Press ESC to continue")
 
     drawText :: Float -> Float -> String -> Picture
     drawText x y = translate x y . scale 0.1 0.1 . color white . Text

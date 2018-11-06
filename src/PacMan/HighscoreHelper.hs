@@ -9,11 +9,9 @@ import Data.List
 data Score = Score {
   playerName :: String,
   playerScore :: Int
-}
+} deriving (Eq)
 
 -- Eq and Ord instances of score
-instance Eq Score where
-  (Score _ a) == (Score _ b) = a == b
 instance Ord Score where
   -- order is reverse because the highest scores are ranked higher
   (Score _ a) `compare` (Score _ b) = b `compare` a
@@ -47,5 +45,5 @@ addScore score highscores = (index, highscores')
     index :: Int
     index = case elemIndex score highscores' of
       Just index' -> index'
-      -- cannot happen because score is added to highscores'
+      -- cannot fail because score is added to highscores'
       _           -> error "cannot find index of score"

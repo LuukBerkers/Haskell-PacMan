@@ -15,7 +15,7 @@ view _ EnterHighscore { highscore, name, charSelected } = pictures $
   (translate (-150) 300    . scale 0.3 0.3 . color white . Text) "Your score was" :
   (translate (-250) (-300) . scale 0.3 0.3 . color white . Text) "Press ENTER to continue" :
   (translate (-180) 180 .                    color white . Text . show) highscore :
-  zipWith3 (\a b c -> a (b c)) translations colors chars
+  zipWith3 (.) colors translations chars
   where
     chars = map (Text . (: [])) name
     translations = map (\x -> translate (fromIntegral x * 140 - 320) (-50)) [1 .. length name]

@@ -15,11 +15,14 @@ view _ EnterHighscore { highscore, name, charSelected } = pictures $
   (translate (-150) 300    . scale 0.3 0.3 . color white . Text) "Your score was" :
   (translate (-250) (-300) . scale 0.3 0.3 . color white . Text) "Press ENTER to continue" :
   (translate (-180) 180 .                    color white . Text . show) highscore :
-  zipWith3 (.) colors translations chars
-  where
-    chars = map (Text . (: [])) name
-    translations = map (\x -> translate (fromIntegral x * 140 - 320) (-50)) [1 .. length name]
-    colors = map color $ replicate charSelected white ++ (cyan : replicate (length name - charSelected - 1) white)
+  -- combines list of color with translation with text, draws the character input
+  zipWith3 (\a b c -> (a . b) c)
+    -- colors, all are white except for the selected index
+    (map color (replicate charSelected white ++ (cyan : replicate (length name - charSelected - 1) white)))
+    -- translations, y is always -50, x is range from -180 to 100
+    (map (\x -> translate (fromIntegral x * 140 - 180) (-50)) [0 .. length name - 1])
+    -- characters, maps ['A', 'A', 'A'] to [['A'], ['A'], ['A']] so each letter can be draw individually
+    (map (Text . (: [])) name)
 view _ _ = Blank
 
 step :: Float -> State -> IO State
@@ -38,13 +41,13 @@ input (EventKey (SpecialKey KeyDown) Down _ _) gameState@EnterHighscore { charSe
 input (EventKey (SpecialKey KeyUp) Down _ _) gameState@EnterHighscore { charSelected, name } = return gameState {
   name = changeIndex charSelected (nextChar (name !! charSelected)) name
 }
--- TODO use appicative?
-input (EventKey (SpecialKey KeyEnter) Down _ _) EnterHighscore { highscore, name } = do
-  highscores <- readHighscores
-  case addScore (Score name highscore) highscores of
-    (index, highscores') -> do
-      _ <- writeHighscore highscores'
-      defaultHighscore (Just index)
+input (EventKey (SpecialKey KeyEnter) Down _ _) EnterHighscore { highscore, name } =
+  -- add score to list of highscores
+  addScore (Score name highscore) <$> readHighscores >>= \(highscoreIndex, highscores') -> do
+    -- save new highscores
+    writeHighscore highscores'
+    -- go to highscore page with selected index
+    defaultHighscore (Just highscoreIndex)
 input _ state = return state
 
 nextChar :: Char -> Char

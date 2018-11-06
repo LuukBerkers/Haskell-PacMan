@@ -43,10 +43,10 @@ instance Renderable GameMap where
       connectWall _    _    _    _    _    = Blank
 
       pad :: [[Cell]] -> [[Cell]]
-      pad gameMap' = addToStartAndEnd (replicate (width + 2) Empty) $ map (addToStartAndEnd Empty) gameMap'
+      pad gameMap' = addToStartAndEnd (replicate (width + 2) Empty) (map (addToStartAndEnd Empty) gameMap')
 
       width, height :: Int
-      (width, height) = size $ lines $ gameMap grid
+      (width, height) = (size . lines . gameMap) grid
 
 -- coin has no update functions
 -- fall back on default implementation of key down and update

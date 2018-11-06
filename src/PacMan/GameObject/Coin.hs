@@ -20,6 +20,6 @@ instance Renderable Coin where
           -- "!!" cannot fail because of mod length
           animation -> animation !! (round (elapsedTime gameState * 5) `mod` length animation)
 
+-- coin has no update functions
+-- fall back on default implementation of key down and update
 instance Updateable Coin where
-  update  _ _ coin = coin
-  keyDown _ _ coin = coin

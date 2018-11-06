@@ -48,6 +48,6 @@ instance Renderable GameMap where
       width, height :: Int
       (width, height) = size $ lines $ gameMap grid
 
+-- coin has no update functions
+-- fall back on default implementation of key down and update
 instance Updateable GameMap where
-  update  _ _ a = a
-  keyDown _ _ a = a

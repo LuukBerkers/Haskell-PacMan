@@ -186,5 +186,3 @@ instance Updateable Ghost where
 
       gridSize :: Vec2
       gridSize = tileToPoint $ fromIntegralVec2 $ size constructedCells
-
-  keyDown _ _ a = a

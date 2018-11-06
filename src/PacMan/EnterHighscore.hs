@@ -44,7 +44,7 @@ input (EventKey (SpecialKey KeyEnter) Down _ _) EnterHighscore { highscore, name
   case addScore (Score name highscore) highscores of
     (index, highscores') -> do
       _ <- writeHighscore highscores'
-      defaultHighscore
+      defaultHighscore (Just index)
 input _ state = return state
 
 nextChar :: Char -> Char

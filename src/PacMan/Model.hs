@@ -147,6 +147,7 @@ data State = Game {
   charSelected :: Int,
   highscore :: Int
 } | Highscores {
+  selectedHighscore :: Maybe Int,
   highscores :: [Score]
 }
 
@@ -188,5 +189,5 @@ defaultMainMenu = MainMenu MainMenuStart
 defaultEnterHighscore :: Int -> State
 defaultEnterHighscore = EnterHighscore (replicate 3 'A') 0
 
-defaultHighscore :: IO State
-defaultHighscore = Highscores <$> readHighscores
+defaultHighscore :: Maybe Int -> IO State
+defaultHighscore selectedHighscore' = Highscores selectedHighscore' <$> readHighscores

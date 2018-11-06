@@ -18,6 +18,7 @@ import PacMan.GameObject.Ghost()
 
 view :: BitmapData -> State -> Picture
 view sprite gameState@Game {
+  gameMode,
   lives,
   level,
   score,

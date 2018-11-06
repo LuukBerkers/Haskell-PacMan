@@ -11,6 +11,10 @@ import PacMan.Class.Renderable
 import PacMan.Class.Updateable
 import System.Random
 
+centerGhostHouse, entranceGhostHouse :: (Float, Float)
+centerGhostHouse   = (13.5, 13)
+entranceGhostHouse = (13.5, 10)
+
 instance Renderable Ghost where
   render sprite Game { powerUpTimer } ghost = uncurry translate (pointToScreen $ positionGhost ghost) $ spriteSection tilePosition sprite
     where
@@ -141,7 +145,7 @@ instance Updateable Ghost where
 
       targetCell :: Vec2
       targetCell = case frightenedGhost ghost of
-          NotFrightened | getGameMap (positionGhost ghost) == GhostHouse -> (13.5, 10)
+          NotFrightened | getGameMap (positionGhost ghost) == GhostHouse -> entranceGhostHouse
           NotFrightened -> case movementMode of
             Scatter -> scatterModeTargetCell
             Chase -> case behaviourGhost ghost of
@@ -158,7 +162,7 @@ instance Updateable Ghost where
               -- Inky tries to be to the otherside of Pac-Man compared to Blinky
               Inky   -> pointToCell $ blinkyPosition =+= ((blinkyPosition =-= positionPacMan (pacMan gameState)) =*- 2)
           -- Ghost is homing, target cell is ghost house
-          _ -> (13.5, 13)
+          _ -> centerGhostHouse
 
       blinkyPosition :: Vec2
       blinkyPosition = case ghosts gameState of (blinky, _, _, _) -> positionGhost blinky

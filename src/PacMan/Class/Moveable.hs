@@ -3,7 +3,6 @@
 module PacMan.Class.Moveable where
 
 import Data.Fixed
-import System.Random
 import Data.List
 import Data.Maybe
 import PacMan.Helper
@@ -13,7 +12,7 @@ class Moveable a where
   move :: Float -> [[Cell]] -> [Direction] -> a -> a
 
 instance Moveable PacMan where
-  move dt gameMap rankedDirections pacMan@PacMan { speedPacMan, positionPacMan, directionPacMan, nextDirectionPacMan, elapsedPath } = pacMan {
+  move dt gameMap rankedDirections pacMan@PacMan { speedPacMan, positionPacMan, directionPacMan, elapsedPath } = pacMan {
     positionPacMan = positionPacMan',
     directionPacMan = directionPacMan',
     elapsedPath = elapsedPath + elapsedPath'
@@ -115,7 +114,10 @@ computeMove position direction speed dt rankedDirections gameMap moveableCells =
       | otherwise = gridElement gameMap nextCell `elem` moveableCells
       where
         nextCell :: (Int, Int)
-        nextCell = roundVec2 (pointToCell position =+= getDirVec nextDirection')
+        nextCell = (roundVec2 . bounds) (pointToCell position =+= getDirVec nextDirection')
+
+        bounds :: Vec2 -> Vec2
+        bounds x = (0, 0) =/\= ((=-- 1) . fromIntegralVec2 . size) gameMap =\/= x
 
     elapsedPath :: Float
     elapsedPath = movementCurrentDirection + movementNextDirection

@@ -55,6 +55,22 @@ infixl 8 =%=
 (=%=) :: Vec2 -> Vec2 -> Vec2
 (=%=) (x1, y1) (x2, y2) = (x1 `mod'` x2, y1 `mod'` y2)
 
+infixl 8 =\/=
+(=\/=) :: Vec2 -> Vec2 -> Vec2
+(=\/=) (x1, y1) (x2, y2) = (x1 `min` x2, y1 `min` y2)
+
+infixl 8 =\/-
+(=\/-) :: Vec2 -> Float -> Vec2
+(=\/-) (x, y) v = (x `min` v, y `min` v)
+
+infixl 8 =/\=
+(=/\=) :: Vec2 -> Vec2 -> Vec2
+(=/\=) (x1, y1) (x2, y2) = (x1 `max` x2, y1 `max` y2)
+
+infixl 8 =/\-
+(=/\-) :: Vec2 -> Float -> Vec2
+(=/\-) (x, y) v = (x `max` v, y `max` v)
+
 getDirVec :: Direction -> Vec2
 getDirVec North = (0, -1)
 getDirVec East = (1, 0)

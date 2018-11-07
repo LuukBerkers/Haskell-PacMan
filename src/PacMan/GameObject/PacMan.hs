@@ -13,22 +13,23 @@ import PacMan.Class.Updateable
 import PacMan.Class.Moveable
 
 instance Renderable PacMan where
-  render sprite gameState pacMan = uncurry translate (pointToScreen $ positionPacMan pacMan) $ dirspriteSection sprite
+  render sprite Game { powerUpTimer } PacMan { directionPacMan, elapsedPath, positionPacMan } = uncurry translate (pointToScreen positionPacMan) (section sprite)
     where
-      dirspriteSection :: BitmapData -> Picture
-      dirspriteSection = case map (, y) xs of
+      section :: BitmapData -> Picture
+      section = case map (, y) xs of
         -- pick frame from animation based on elapesedPath
         -- "!!" cannot fail because of mod length
-        animation -> spriteSection $ animation !! (round (elapsedPath pacMan / 10) `mod` length animation)
+        animation -> spriteSection $ animation !! (round (elapsedPath / 10) `mod` length animation)
         where
-          y = case directionPacMan pacMan of
+          y = case directionPacMan of
             North -> 7
             East  -> 9
             South -> 8
             West  -> 10
-          xs = case powerUpTimer gameState of
+          xs = case powerUpTimer of
             0 -> [4, 5, 6, 7, 6, 5]
             _ -> [0, 1, 2, 3, 2, 1]
+  render _ _ _ = Blank
 
 instance Updateable PacMan where
   update Game { grid = GameMap { gameMap } } dt pacMan@PacMan { nextDirectionPacMan, directionPacMan } = move dt (constructCells gameMap) [nextDirectionPacMan, directionPacMan] pacMan

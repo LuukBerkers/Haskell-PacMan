@@ -57,18 +57,15 @@ instance Renderable Ghost where
   render _ _ _ = Blank
 
 instance Updateable Ghost where
-  update Game { pacMan, coins } _ ghost@Ghost { spawnMode = NotSpawned, behaviourGhost } = ghost { spawnMode = spawnMode' }
+  update Game { pacMan, score } _ ghost@Ghost { spawnMode = NotSpawned, behaviourGhost } = ghost { spawnMode = spawnMode' }
     where
       spawnMode' :: SpawnMode
       spawnMode' = case elapsedPath pacMan of
         0 -> NotSpawned
         _ -> case behaviourGhost of
-          Inky  -> if coinsEaten > 30  then Spawned else NotSpawned
-          Clyde -> if coinsEaten > 100 then Spawned else NotSpawned
+          Inky  -> if score > 500  then Spawned else NotSpawned
+          Clyde -> if score > 1500 then Spawned else NotSpawned
           _     -> Spawned
-
-      coinsEaten :: Int
-      coinsEaten = length $ filter (\coin -> stateCoin coin == Eaten) coins
 
   update Game {
     ghostMovementProgress,

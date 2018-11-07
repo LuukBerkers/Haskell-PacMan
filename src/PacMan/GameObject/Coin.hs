@@ -20,6 +20,7 @@ instance Renderable Coin where
           -- pick frame from animation bases on elapsedTime
           -- "!!" cannot fail because of mod length
           animation -> animation !! (round (elapsedTime * 5) `mod` length animation)
+  render _ _ _ = Blank
 
 -- coin has no update functions
 -- fall back on default implementation of key down and update

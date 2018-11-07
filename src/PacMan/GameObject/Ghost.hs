@@ -3,7 +3,6 @@
 module PacMan.GameObject.Ghost where
 
 import System.Random
-import Data.Maybe
 import Data.List
 import Graphics.Gloss.Data.Picture
 import PacMan.Model
@@ -66,7 +65,6 @@ instance Updateable Ghost where
           Inky  -> if score > 500  then Spawned else NotSpawned
           Clyde -> if score > 1500 then Spawned else NotSpawned
           _     -> Spawned
-
   update Game {
     ghostMovementProgress,
     pacMan = PacMan { positionPacMan, directionPacMan },
@@ -146,3 +144,4 @@ instance Updateable Ghost where
             where
               width, height :: Float
               (width, height) = (fromIntegralVec2 . size . constructCells) gameMap
+  update _ _ ghost = ghost

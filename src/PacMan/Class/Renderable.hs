@@ -6,4 +6,4 @@ import PacMan.Model
 
 class Renderable a where
   render :: BitmapData -> State -> a -> Picture
-  render _ _ a = Blank
+  render _ _ _ = Blank

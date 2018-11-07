@@ -28,7 +28,7 @@ view _ Highscores { highscores, selectedHighscore } = pictures $
         Just index | index > 9 -> [0 .. totalScores - 2] ++ [index]
         _                      -> [0 .. totalScores - 1]
 
-    -- rankings, names, scores :: [String]
+    rankings, names, scores :: [Picture]
     rankings = map (Text . show . (+ 1)) indexes
     (names, scores) = unzip $ map (\index -> case highscores !! index of
       Score name score -> (Text name, (Text . show) score)) indexes

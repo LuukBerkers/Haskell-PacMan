@@ -78,13 +78,11 @@ data Coin = Coin {
   typeCoin :: CoinType,
   positionCoin :: Vec2
 }
-defaultCoins :: IO [Coin]
-defaultCoins = do
-  gameMap' <- readFile "data/gameMap.txt"
-  return $ mapMaybe convert $ zip (coords gameMap') $ concat $ constructCells gameMap'
+defaultCoins :: [[Cell]] -> [Coin]
+defaultCoins gameMap' = (mapMaybe convert . zip (coords gameMap') . concat) gameMap'
   where
-    coords :: String -> [Vec2]
-    coords gameMap' = case size $ constructCells gameMap' of
+    coords :: [[Cell]] -> [Vec2]
+    coords gameMap' = case size gameMap' of
       (width, height) -> [fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
     convert :: (Vec2, Cell) -> Maybe Coin
@@ -93,7 +91,7 @@ defaultCoins = do
     convert _                    = Nothing
 
 newtype GameMap = GameMap {
-  gameMap :: String
+  gameMap :: [[Cell]]
 }
 
 data GhostBehaviour = Clyde | Pinky | Inky | Blinky
@@ -108,18 +106,13 @@ data Ghost = Ghost {
   spawnMode :: SpawnMode,
   stdGen :: StdGen
 }
-defaultGhosts :: IO (Ghost, Ghost, Ghost, Ghost)
-defaultGhosts = do
-  stdGenBlinky <- newStdGen
-  stdGenPinky  <- newStdGen
-  stdGenInky   <- newStdGen
-  stdGenClyde  <- newStdGen
-  return (
-      Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened NotSpawned stdGenBlinky,
-      Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  NotFrightened NotSpawned stdGenPinky,
-      Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   NotFrightened NotSpawned stdGenInky,
-      Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  NotFrightened NotSpawned stdGenClyde
-    )
+defaultGhosts :: StdGen -> (Ghost, Ghost, Ghost, Ghost)
+defaultGhosts stdGen = (
+    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened NotSpawned stdGen,
+    Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  NotFrightened NotSpawned stdGen,
+    Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   NotFrightened NotSpawned stdGen,
+    Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  NotFrightened NotSpawned stdGen
+  )
 
 -- State of the game
 data GameMode = Playing | Paused
@@ -151,37 +144,22 @@ data State = Game {
   highscores :: [Score]
 }
 
-defaultGameMode :: GameMode
-defaultGameMode = Playing
-defaultElapsedTime :: Float
-defaultElapsedTime = 0
-defaultPowerUpTimer :: Float
-defaultPowerUpTimer = 0
-defaultScore :: Int
-defaultScore = 0
-defaultLevel :: Int
-defaultLevel =  0
-defaultLives :: Int
-defaultLives = 3
-
-defaultGameMap :: IO GameMap
-defaultGameMap = GameMap <$> readFile "data/gameMap.txt"
-
-defaultGame :: IO State
-defaultGame = Game <$>
-  return defaultGameMode <*>
-  return defaultElapsedTime <*>
-  return defaultPowerUpTimer <*>
-  return defaultScore <*>
-  return defaultLevel <*>
-  return defaultLives <*>
-  return defaultLevelProgress <*>
-  return defaultPowerUpDuration <*>
-  return defaultMovementModeProgress <*>
-  defaultGameMap <*>
-  return defaultPacMan <*>
-  defaultGhosts <*>
-  defaultCoins
+defaultGame :: StdGen -> [[Cell]] -> State
+defaultGame stdGen gameMap' = Game {
+  gameMode = Playing,
+  elapsedTime = 0,
+  powerUpTimer = 0,
+  score = 0,
+  level = 0,
+  lives = 3,
+  levelProgress = defaultLevelProgress,
+  powerUpDuration = defaultPowerUpDuration,
+  ghostMovementProgress = defaultMovementModeProgress,
+  grid = GameMap gameMap',
+  pacMan = defaultPacMan,
+  ghosts = defaultGhosts stdGen,
+  coins = defaultCoins gameMap'
+}
 
 defaultMainMenu :: State
 defaultMainMenu = MainMenu MainMenuStart
@@ -189,5 +167,5 @@ defaultMainMenu = MainMenu MainMenuStart
 defaultEnterHighscore :: Int -> State
 defaultEnterHighscore = EnterHighscore (replicate 3 'A') 0
 
-defaultHighscore :: Maybe Int -> IO State
-defaultHighscore selectedHighscore' = Highscores selectedHighscore' <$> readHighscores
+defaultHighscore :: Maybe Int -> [Score] -> State
+defaultHighscore = Highscores

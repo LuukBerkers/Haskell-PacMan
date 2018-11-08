@@ -32,7 +32,7 @@ instance Renderable PacMan where
   render _ _ _ = Blank
 
 instance Updateable PacMan where
-  update Game { grid = GameMap { gameMap } } dt pacMan@PacMan { nextDirectionPacMan, directionPacMan } = move dt (constructCells gameMap) [nextDirectionPacMan, directionPacMan] pacMan
+  update Game { grid = GameMap { gameMap } } dt pacMan@PacMan { nextDirectionPacMan, directionPacMan } = move dt gameMap [nextDirectionPacMan, directionPacMan] pacMan
   update _ _ pacMan = pacMan
 
   keyDown _ key pacMan = case getDirection of

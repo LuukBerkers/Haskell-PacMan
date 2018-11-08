@@ -47,7 +47,7 @@ input (EventKey (SpecialKey KeyEnter) Down _ _) EnterHighscore { highscore, name
     -- save new highscores
     writeHighscore highscores'
     -- go to highscore page with selected index
-    defaultHighscore (Just highscoreIndex)
+    defaultHighscore (Just highscoreIndex) <$> readHighscores
 input _ state = return state
 
 nextChar :: Char -> Char

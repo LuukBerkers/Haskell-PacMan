@@ -2,6 +2,7 @@
 
 module PacMan.Game where
 
+import System.Random
 import Data.List
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Color
@@ -67,8 +68,8 @@ step dt gameState@Game {
 }
   -- If all coins are eaten, advance to next level
   | all coinIsEaten coins = do
-    defaultGhosts' <- defaultGhosts
-    defaultCoins'  <- defaultCoins
+    gameMap' <- readGameMap
+    stdGen   <- newStdGen
     return gameState {
       levelProgress = nextLevelProgress,                -- update level progress
       ghostMovementProgress = nextMovementModeProgress, -- update movement mode progress
@@ -77,20 +78,20 @@ step dt gameState@Game {
       elapsedTime = 0,                                  -- reset elapsed time
       powerUpTimer = 0,                                 -- reset power up timer
       pacMan = defaultPacMan,                           -- reset Pac-Man
-      ghosts = defaultGhosts',                          -- reset Ghosts
-      coins = defaultCoins'                             -- reset coins
+      ghosts = defaultGhosts stdGen,                   -- reset Ghosts
+      coins = defaultCoins gameMap'                     -- reset coins
     }
   -- Check if Pac-Man died
   | die blinky || die pinky || die inky || die clyde = case lives - 1 of
     0      -> return $ defaultEnterHighscore score
     lives' -> do
-      defaultGhosts' <- defaultGhosts
+      stdGen <- newStdGen
       return gameState {
         lives = lives',                                      -- decrease lives
         ghostMovementProgress = currentMovementModeProgress, -- reset movement progress
         powerUpTimer = 0,                                    -- reset power up timer
         elapsedTime = 0,                                     -- reset elapsed time
-        ghosts = defaultGhosts',                             -- reset ghosts
+        ghosts = defaultGhosts stdGen,                       -- reset ghosts
         pacMan = defaultPacMan                               -- reset Pac-Man
       }
   -- Update game

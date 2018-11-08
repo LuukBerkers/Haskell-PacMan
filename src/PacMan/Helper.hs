@@ -102,17 +102,6 @@ size :: [[a]] -> (Int, Int)
 size y@(x:_) = (length x, length y)
 size y       = (0,        length y)
 
-constructCells :: String -> [[Cell]]
-constructCells = map (map replace) . lines
-  where
-    replace :: Char -> Cell
-    replace 'o' = CoinCell
-    replace 'O' = PowerUpCell
-    replace '#' = Wall
-    replace '_' = GhostHouse
-    replace ' ' = Empty
-    replace _   = Empty -- unknown
-
 oppositeDirection :: Direction -> Direction
 oppositeDirection North = South
 oppositeDirection East  = West
@@ -148,3 +137,14 @@ shuffle stdGenA xs = (c : shuffle', stdGenC)
     (index, stdGenB) = randomR (0, length xs - 1) stdGenA
     (l, c:r) = splitAt index xs
     (shuffle', stdGenC) = shuffle stdGenB (l ++ r)
+
+readGameMap :: IO [[Cell]]
+readGameMap = map (map replace) . lines <$> readFile "data/gameMap.txt"
+  where
+    replace :: Char -> Cell
+    replace 'o' = CoinCell
+    replace 'O' = PowerUpCell
+    replace '#' = Wall
+    replace '_' = GhostHouse
+    replace ' ' = Empty
+    replace _   = Empty -- unknown

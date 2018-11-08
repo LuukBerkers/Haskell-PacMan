@@ -88,7 +88,7 @@ instance Updateable Ghost where
         _ -> frightenedGhost
 
       movedGhost :: Ghost
-      movedGhost = move dt (constructCells gameMap) rankedDirections ghost
+      movedGhost = move dt gameMap rankedDirections ghost
 
       rankedDirections :: [Direction]
       stdGen' :: StdGen
@@ -103,7 +103,7 @@ instance Updateable Ghost where
           distanceToDirection direction = lengthVec2 (pointToCell position =+= getDirVec direction =-= targetCell)
 
       ghostIsHome :: Bool
-      ghostIsHome = gridElement (constructCells gameMap) (roundVec2 (pointToCell position)) == GhostHouse
+      ghostIsHome = gridElement gameMap (roundVec2 (pointToCell position)) == GhostHouse
 
       targetCell :: Vec2
       targetCell = case frightenedGhost of
@@ -143,5 +143,5 @@ instance Updateable Ghost where
             Clyde  -> (0, height)
             where
               width, height :: Float
-              (width, height) = (fromIntegralVec2 . size . constructCells) gameMap
+              (width, height) = (fromIntegralVec2 . size) gameMap
   update _ _ ghost = ghost

@@ -55,3 +55,25 @@ instance Updateable PacMan where
         KeyDown  -> Just South
         KeyLeft  -> Just West
         _        -> Nothing
+
+instance Moveable PacMan where
+  move dt Game { grid = GameMap { gameMap } } pacMan@PacMan { nextDirectionPacMan, speedPacMan, positionPacMan, directionPacMan, elapsedPath } = pacMan {
+    positionPacMan = positionPacMan',
+    directionPacMan = directionPacMan',
+    elapsedPath = elapsedPath + elapsedPath'
+  }
+    where
+      positionPacMan' :: Vec2
+      directionPacMan' :: Direction
+      elapsedPath' :: Float
+      (positionPacMan', directionPacMan', elapsedPath') = computeMove
+        positionPacMan
+        directionPacMan
+        speedPacMan
+        dt
+        rankedDirections
+        gameMap
+        [CoinCell, PowerUpCell, Empty]
+
+      rankedDirections :: [Direction]
+      rankedDirections = [nextDirectionPacMan, directionPacMan]

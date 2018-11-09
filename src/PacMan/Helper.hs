@@ -21,23 +21,15 @@ getVector East  = (1,  0)
 getVector South = (0,  1)
 getVector West  = (-1, 0)
 
-pointToScreen :: Point -> Point
+pointToScreen, cellToPoint, cellToScreen :: Point -> Point
 pointToScreen (x, y) = (x - 270, 290 - y)
+cellToPoint (x, y)   = (fromIntegral tileWidth * x, fromIntegral tileHeight * y)
+cellToScreen         = pointToScreen . cellToPoint
 
-cellToPoint :: Point -> Point
-cellToPoint (x, y) = (fromIntegral tileWidth * x, fromIntegral tileHeight * y)
-
-cellToScreen :: Point -> Point
-cellToScreen = pointToScreen . cellToPoint
-
-pointToCell :: Point -> Point
-pointToCell (x, y) = (x / fromIntegral tileWidth, y / fromIntegral tileHeight)
-
-screenToPoint :: Point -> Point
+pointToCell, screenToPoint, screenToCell :: Point -> Point
+pointToCell (x, y)   = (x / fromIntegral tileWidth, y / fromIntegral tileHeight)
 screenToPoint (x, y) = (x + 270, 290 - y)
-
-screenToCell :: Point -> Point
-screenToCell = pointToCell . screenToPoint
+screenToCell         = pointToCell . screenToPoint
 
 fromIntegralVec2 :: (Int, Int) -> Point
 fromIntegralVec2 (x, y) = (fromIntegral x, fromIntegral y)

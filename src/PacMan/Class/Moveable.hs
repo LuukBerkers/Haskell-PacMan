@@ -55,7 +55,7 @@ instance Moveable Ghost where
 
       moveableCells :: [Cell]
       moveableCells = case frightenedGhost of
-        NotFrightened | gridElement gameMap (roundVec2 (pointToCell positionGhost)) == GhostHouse
+        NotFrightened | getGridElement gameMap (roundVec2 (pointToCell positionGhost)) == GhostHouse
                       -> [CoinCell, PowerUpCell, Empty, GhostHouse]
         NotFrightened -> [CoinCell, PowerUpCell, Empty]
         _             -> [CoinCell, PowerUpCell, Empty, GhostHouse]
@@ -104,14 +104,14 @@ computeMove position direction speed dt rankedDirections gameMap moveableCells =
       | otherwise = direction
 
     gridSize :: Vec2
-    gridSize = (tileToPoint . fromIntegralVec2 . size) gameMap
+    gridSize = (cellToPoint . fromIntegralVec2 . size) gameMap
 
     canMove :: Direction -> Bool
     canMove nextDirection'
       -- cannot move into direction
       | nextDirection' == oppositeDirection direction = False
       -- can only move if the next cell is one of moveableCells
-      | otherwise = gridElement gameMap nextCell `elem` moveableCells
+      | otherwise = getGridElement gameMap nextCell `elem` moveableCells
       where
         nextCell :: (Int, Int)
         nextCell = (roundVec2 . bounds) (pointToCell position =+= getDirVec nextDirection')

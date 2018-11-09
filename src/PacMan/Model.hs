@@ -69,7 +69,7 @@ data PacMan = PacMan {
   speedPacMan :: Float
 }
 defaultPacMan :: PacMan
-defaultPacMan = PacMan 0 (tileToPoint (13.5, 22)) North North (8 * fromIntegral tileWidth)
+defaultPacMan = PacMan 0 (cellToPoint (13.5, 22)) North North (8 * fromIntegral tileWidth)
 
 data CoinState = Eaten | Alive deriving (Eq)
 data CoinType = Regular | PowerUp
@@ -108,10 +108,10 @@ data Ghost = Ghost {
 }
 defaultGhosts :: StdGen -> (Ghost, Ghost, Ghost, Ghost)
 defaultGhosts stdGen = (
-    Ghost (tileToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened NotSpawned stdGen,
-    Ghost (tileToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  NotFrightened NotSpawned stdGen,
-    Ghost (tileToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   NotFrightened NotSpawned stdGen,
-    Ghost (tileToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  NotFrightened NotSpawned stdGen
+    Ghost (cellToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened NotSpawned stdGen,
+    Ghost (cellToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  NotFrightened NotSpawned stdGen,
+    Ghost (cellToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   NotFrightened NotSpawned stdGen,
+    Ghost (cellToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  NotFrightened NotSpawned stdGen
   )
 
 -- State of the game

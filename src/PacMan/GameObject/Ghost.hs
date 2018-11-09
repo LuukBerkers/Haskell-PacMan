@@ -103,7 +103,7 @@ instance Updateable Ghost where
           distanceToDirection direction = lengthVec2 (pointToCell position =+= getDirVec direction =-= targetCell)
 
       ghostIsHome :: Bool
-      ghostIsHome = gridElement gameMap (roundVec2 (pointToCell position)) == GhostHouse
+      ghostIsHome = getGridElement gameMap (roundVec2 (pointToCell position)) == GhostHouse
 
       targetCell :: Vec2
       targetCell = case frightenedGhost of

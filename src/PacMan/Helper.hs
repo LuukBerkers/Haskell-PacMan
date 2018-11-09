@@ -80,11 +80,11 @@ getDirVec West = (-1, 0)
 pointToScreen :: Vec2 -> Vec2
 pointToScreen (x, y) = (x - 270, 290 - y)
 
-tileToScreen :: Vec2 -> Vec2
-tileToScreen = pointToScreen . tileToPoint
+cellToPoint :: Vec2 -> Vec2
+cellToPoint coord = (fromIntegral tileWidth, fromIntegral tileHeight) =*= coord
 
-tileToPoint :: Vec2 -> Vec2
-tileToPoint coord = (fromIntegral tileWidth, fromIntegral tileHeight) =*= coord
+cellToScreen :: Vec2 -> Vec2
+cellToScreen = pointToScreen . cellToPoint
 
 pointToCell :: Vec2 -> Vec2
 pointToCell coord = coord =/= (fromIntegral tileWidth, fromIntegral tileHeight)
@@ -117,11 +117,11 @@ oppositeDirection West  = East
 spriteSection :: (Int, Int) -> BitmapData -> Picture
 spriteSection (x, y) = bitmapSection $ Rectangle (1 + x * (tileWidth + 1), 1 + y * (tileHeight + 1)) (tileWidth, tileHeight)
 
-gridElement :: [[Cell]] -> (Int, Int) -> Cell
-gridElement ((h : _ ) : _)  (0, 0) = h
-gridElement ((_ : hs) : _)  (x, 0) = gridElement [hs] (x - 1, 0)
-gridElement (_        : vs) (x, y) = gridElement vs (x, y - 1)
-gridElement _               _      = Empty
+getGridElement :: [[Cell]] -> (Int, Int) -> Cell
+getGridElement ((h : _ ) : _)  (0, 0) = h
+getGridElement ((_ : hs) : _)  (x, 0) = getGridElement [hs] (x - 1, 0)
+getGridElement (_        : vs) (x, y) = getGridElement vs (x, y - 1)
+getGridElement _               _      = Empty
 
 setGridElement :: [[Cell]] -> (Int, Int) -> Cell -> [[Cell]]
 setGridElement ((_ : hs) : vs) (0, 0) e = (e : hs) : vs

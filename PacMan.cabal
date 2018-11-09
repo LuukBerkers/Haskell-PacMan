@@ -26,6 +26,7 @@ executable PacMan
                        PacMan.MainMenu,
                        PacMan.EnterHighscore,
                        PacMan.Highscores,
+                       PacMan.MapEditor,
                        PacMan.GameObject.Coin,
                        PacMan.GameObject.Ghost,
                        PacMan.GameObject.PacMan,

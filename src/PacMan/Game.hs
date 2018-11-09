@@ -18,16 +18,7 @@ import PacMan.GameObject.PacMan()
 import PacMan.GameObject.Ghost()
 
 view :: BitmapData -> State -> Picture
-view sprite gameState@Game {
-  gameMode,
-  lives,
-  level,
-  score,
-  coins,
-  pacMan,
-  grid,
-  ghosts = (blinky, pinky, inky, clyde)
-} = pictures $
+view sprite gameState@Game { gameMode, lives, level, score, coins, pacMan, grid, ghosts = (blinky, pinky, inky, clyde) } = pictures $
   render' grid :
   map render' coins ++
   [render' pacMan, render' blinky, render' pinky, render' inky, render' clyde] ++

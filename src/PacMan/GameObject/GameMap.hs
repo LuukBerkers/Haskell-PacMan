@@ -9,10 +9,10 @@ import PacMan.Class.Renderable
 import PacMan.Class.Updateable
 
 instance Renderable GameMap where
-  render sprite _ GameMap { gameMap } = pictures $ zipWith (uncurry translate) coords connectWalls
+  render sprite _ GameMap { gameMap } = (pictures . zipWith (uncurry translate) coords) connectWalls
     where
       coords :: [Vec2]
-      coords = [tileToScreen $ fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
+      coords = [(cellToScreen . fromIntegralVec2) (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
       connectWalls :: [Picture]
       connectWalls = (loopY . pad) gameMap

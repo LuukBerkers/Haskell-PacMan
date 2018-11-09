@@ -11,7 +11,7 @@ tileWidth = 20
 tileHeight = 20
 
 data Direction = North | East | South | West deriving (Show, Eq)
-data Cell = Wall | CoinCell | PowerUpCell | Empty | GhostHouse deriving (Show, Eq)
+data Cell = GhostHouse | Empty | Wall | CoinCell | PowerUpCell deriving (Show, Eq)
 
 type Vec2 = (Float, Float)
 
@@ -89,6 +89,12 @@ tileToPoint coord = (fromIntegral tileWidth, fromIntegral tileHeight) =*= coord
 pointToCell :: Vec2 -> Vec2
 pointToCell coord = coord =/= (fromIntegral tileWidth, fromIntegral tileHeight)
 
+screenToPoint :: Vec2 -> Vec2
+screenToPoint (x, y) = (x + 270, 290 - y)
+
+screenToCell :: Vec2 -> Vec2
+screenToCell = pointToCell . screenToPoint
+
 fromIntegralVec2 :: (Int, Int) -> Vec2
 fromIntegralVec2 (x, y) = (fromIntegral x, fromIntegral y)
 
@@ -116,6 +122,13 @@ gridElement ((h : _ ) : _)  (0, 0) = h
 gridElement ((_ : hs) : _)  (x, 0) = gridElement [hs] (x - 1, 0)
 gridElement (_        : vs) (x, y) = gridElement vs (x, y - 1)
 gridElement _               _      = Empty
+
+setGridElement :: [[Cell]] -> (Int, Int) -> Cell -> [[Cell]]
+setGridElement ((_ : hs) : vs) (0, 0) e = (e : hs) : vs
+setGridElement ((h : hs) : vs) (x, 0) e = case setGridElement [hs] (x - 1, 0) e of
+  (v':_) -> (h:v'):vs
+setGridElement (v        : vs) (x, y) e = v : setGridElement vs (x, y - 1) e
+setGridElement _               _      _ = error "could not find index"
 
 -- made my loadfunction because I want to use BitmapData instead of Picture
 loadBitmapData :: FilePath -> IO BitmapData

@@ -142,6 +142,9 @@ data State = Game {
 } | Highscores {
   selectedHighscore :: Maybe Int,
   highscores :: [Score]
+} | MapEditor {
+  grid :: GameMap,
+  coins :: [Coin]
 }
 
 defaultGame :: StdGen -> [[Cell]] -> State
@@ -169,3 +172,9 @@ defaultEnterHighscore = EnterHighscore (replicate 3 'A') 0
 
 defaultHighscore :: Maybe Int -> [Score] -> State
 defaultHighscore = Highscores
+
+defaultMapEditor :: [[Cell]] -> State
+defaultMapEditor gameMap' = MapEditor {
+  grid = GameMap gameMap',
+  coins = defaultCoins gameMap'
+}

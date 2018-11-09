@@ -32,7 +32,8 @@ instance Renderable PacMan where
   render _ _ _ = Blank
 
 instance Updateable PacMan where
-  update gameState dt pacMan = move dt gameState pacMan
+  -- only move Pac-Man on update
+  update = move
 
   keyDown _ key pacMan = case getDirection of
     -- Pac-Man can always move backwards
@@ -56,7 +57,7 @@ instance Updateable PacMan where
         _        -> Nothing
 
 instance Moveable PacMan where
-  move dt Game { grid = GameMap { gameMap } } pacMan@PacMan { nextDirectionPacMan, speedPacMan, positionPacMan, directionPacMan, elapsedPath } = pacMan {
+  move Game { grid = GameMap { gameMap } } dt pacMan@PacMan { nextDirectionPacMan, speedPacMan, positionPacMan, directionPacMan, elapsedPath } = pacMan {
     positionPacMan = positionPacMan',
     directionPacMan = directionPacMan',
     elapsedPath = elapsedPath + elapsedPath'

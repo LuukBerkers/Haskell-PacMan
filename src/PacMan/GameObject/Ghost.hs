@@ -69,15 +69,15 @@ instance Updateable Ghost where
           Inky  -> if score > 500  then Spawned else NotSpawned
           Clyde -> if score > 1500 then Spawned else NotSpawned
           _     -> Spawned
-  update gameState dt ghost = move dt gameState ghost
+  update gameState dt ghost = move gameState dt ghost
 
 instance Moveable Ghost where
-  move dt Game {
+  move Game {
     ghostMovementProgress,
     ghosts,
     pacMan = PacMan { positionPacMan, directionPacMan },
     grid = GameMap { gameMap }
-  } ghost@Ghost {
+  } dt ghost@Ghost {
     frightenedGhost,
     speedGhost,
     positionGhost = position,

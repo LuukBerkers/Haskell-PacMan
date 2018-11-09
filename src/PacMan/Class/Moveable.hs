@@ -11,7 +11,7 @@ import PacMan.Helper
 import PacMan.Model
 
 class Moveable a where
-  move :: Float -> State -> a -> a
+  move :: State -> Float -> a -> a
 
 computeMove :: Point -> Direction -> Float -> Float -> [Direction] -> [[Cell]] -> [Cell] -> (Point, Direction, Float)
 computeMove position direction speed dt rankedDirections gameMap moveableCells = (position', direction', elapsedPath)

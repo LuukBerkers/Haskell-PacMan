@@ -69,30 +69,23 @@ instance Updateable Ghost where
           Inky  -> if score > 500  then Spawned else NotSpawned
           Clyde -> if score > 1500 then Spawned else NotSpawned
           _     -> Spawned
-  update gameState@Game {
-    pacMan = PacMan { positionPacMan },
-    grid = GameMap { gameMap }
-  } dt ghost@Ghost {
-    positionGhost = position,
-    frightenedGhost
-  } = movedGhost {
-    frightenedGhost = frightened
-  }
-    where
-      frightened :: FrightenedMode
-      frightened = case frightenedGhost of
-        Homing | ghostIsHome gameMap position -> NotFrightened
-        -- if ghost is frightened and hit Pac-Man, go back to home to respawn
-        Frightened | roundVec2 (pointToCell positionPacMan) == roundVec2 (pointToCell position) -> Homing
-        _ -> frightenedGhost
-
-      movedGhost :: Ghost
-      movedGhost = move dt gameState ghost
-
+  update gameState dt ghost = move dt gameState ghost
   update _ _ ghost = ghost
 
 instance Moveable Ghost where
-  move dt Game { ghostMovementProgress, ghosts, pacMan = PacMan { positionPacMan, directionPacMan }, grid = GameMap { gameMap } } ghost@Ghost { frightenedGhost, speedGhost, positionGhost = position, directionGhost = direction, behaviourGhost, stdGen } = ghost {
+  move dt Game {
+    ghostMovementProgress,
+    ghosts,
+    pacMan = PacMan { positionPacMan, directionPacMan },
+    grid = GameMap { gameMap }
+  } ghost@Ghost {
+    frightenedGhost,
+    speedGhost,
+    positionGhost = position,
+    directionGhost = direction,
+    behaviourGhost,
+    stdGen
+  } = ghost {
     stdGen = stdGen',
     positionGhost = positionGhost',
     directionGhost = directionGhost'

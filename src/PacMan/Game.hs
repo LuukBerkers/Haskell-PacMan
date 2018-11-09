@@ -74,7 +74,7 @@ step dt gameState@Game {
     }
   -- Check if Pac-Man died
   | die blinky || die pinky || die inky || die clyde = case lives - 1 of
-    0      -> return $ defaultEnterHighscore score
+    0      -> return (defaultEnterHighscore score)
     lives' -> do
       stdGen <- newStdGen
       return gameState {
@@ -89,6 +89,7 @@ step dt gameState@Game {
   | otherwise = return $
     updateGhostMovementProgress dt $
     updateCoins dt $
+    updateGhosts dt $
     updatePowerUpTimer dt $
     gameState {
       elapsedTime = elapsedTime + dt,                                       -- increase elapsedTime
@@ -109,7 +110,7 @@ step dt gameState@Game {
       die Ghost {
         frightenedGhost = NotFrightened,
         positionGhost
-      } = roundVec2 (pointToCell $ positionPacMan pacMan) == roundVec2 (pointToCell positionGhost)
+      } = (roundVec2 . pointToCell . positionPacMan) pacMan == roundVec2 (pointToCell positionGhost)
       die _ = False
 
       currentMovementModeProgress :: MovementModeProgress
@@ -149,7 +150,7 @@ updateCoins _ gameState@Game {
   where
     isEaten :: Coin -> Bool
     isEaten Coin { stateCoin = Eaten } = False
-    isEaten coin = roundVec2 (pointToCell $ positionPacMan pacMan) == roundVec2 (positionCoin coin)
+    isEaten coin = (roundVec2 . pointToCell . positionPacMan) pacMan == (roundVec2 . positionCoin) coin
 
     isPowerUp :: Coin -> Bool
     isPowerUp Coin { typeCoin = PowerUp } = True
@@ -180,6 +181,30 @@ updateGhostMovementProgress dt gameState@Game { ghostMovementProgress = (StepMov
     newTime = time - dt
 updateGhostMovementProgress _  gameState = gameState
 
+-- TODO update score on eating ghost
+updateGhosts :: Float -> State -> State
+updateGhosts _ gameState@Game {
+  score,
+  pacMan = PacMan { positionPacMan },
+  grid = GameMap { gameMap },
+  ghosts = (blinky, pinky, inky, clyde)
+} = gameState {
+  score = score + 1,
+  ghosts = (updateGhost blinky, updateGhost pinky, updateGhost inky, updateGhost clyde)
+}
+  where
+    updateGhost :: Ghost -> Ghost
+    updateGhost ghost@Ghost {
+      positionGhost = position,
+      frightenedGhost
+    } = ghost {
+      frightenedGhost = case frightenedGhost of
+        Homing | ghostIsHome gameMap position -> NotFrightened
+        -- if ghost is frightened and hit Pac-Man, go back to home to respawn
+        Frightened | roundVec2 (pointToCell positionPacMan) == roundVec2 (pointToCell position) -> Homing
+        _ -> frightenedGhost
+    }
+
 updatePowerUpTimer :: Float -> State -> State
 updatePowerUpTimer _ gameState@Game { powerUpTimer = 0, ghosts = (blinky, pinky, inky, clyde) } = gameState {
   ghosts = (unFrighten blinky, unFrighten pinky, unFrighten inky, unFrighten clyde)
@@ -189,7 +214,6 @@ updatePowerUpTimer _ gameState@Game { powerUpTimer = 0, ghosts = (blinky, pinky,
     unFrighten ghost@Ghost { frightenedGhost = Homing }     = ghost { frightenedGhost = NotFrightened }
     unFrighten ghost@Ghost { frightenedGhost = Frightened } = ghost { frightenedGhost = NotFrightened }
     unFrighten ghost = ghost
-
 updatePowerUpTimer dt gameState@Game { powerUpTimer } = gameState {
   -- count down powerup timer
   powerUpTimer = max 0 (powerUpTimer - dt)

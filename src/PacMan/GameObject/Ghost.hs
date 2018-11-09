@@ -12,6 +12,7 @@ import PacMan.Helper
 import PacMan.Class.Renderable
 import PacMan.Class.Updateable
 import PacMan.Class.Moveable
+import PacMan.LevelProgress
 
 -- Move to constants file
 centerGhostHouse, entranceGhostHouse :: (Float, Float)

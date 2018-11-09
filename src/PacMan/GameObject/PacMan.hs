@@ -6,7 +6,6 @@ module PacMan.GameObject.PacMan where
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
 import Graphics.Gloss.Interface.IO.Game
-import Graphics.Gloss.Data.Point
 import PacMan.Model hiding (pacMan)
 import PacMan.Helper
 import PacMan.Class.Renderable
@@ -20,7 +19,7 @@ instance Renderable PacMan where
       section = case map (, y) xs of
         -- pick frame from animation based on elapesedPath
         -- "!!" cannot fail because of mod length
-        animation -> spriteSection $ animation !! (round (elapsedPath / 10) `mod` length animation)
+        animation -> spriteSection (animation !! (round (elapsedPath / 10) `mod` length animation))
         where
           y = case directionPacMan of
             North -> 7
@@ -34,7 +33,6 @@ instance Renderable PacMan where
 
 instance Updateable PacMan where
   update gameState dt pacMan = move dt gameState pacMan
-  update _ _ pacMan = pacMan
 
   keyDown _ key pacMan = case getDirection of
     -- Pac-Man can always move backwards
@@ -78,3 +76,4 @@ instance Moveable PacMan where
 
       rankedDirections :: [Direction]
       rankedDirections = [nextDirectionPacMan, directionPacMan]
+  move _ _ ghost = ghost

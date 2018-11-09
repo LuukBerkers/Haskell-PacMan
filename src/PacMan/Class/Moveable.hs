@@ -2,23 +2,24 @@
 
 module PacMan.Class.Moveable where
 
-import System.Random
 import Data.Fixed
 import Data.List
 import Data.Maybe
+import qualified Graphics.Gloss.Data.Point.Arithmetic as Pt
+import Graphics.Gloss.Data.Point
 import PacMan.Helper
 import PacMan.Model
 
 class Moveable a where
   move :: Float -> State -> a -> a
 
-computeMove :: Vec2 -> Direction -> Float -> Float -> [Direction] -> [[Cell]] -> [Cell] -> (Vec2, Direction, Float)
+computeMove :: Point -> Direction -> Float -> Float -> [Direction] -> [[Cell]] -> [Cell] -> (Point, Direction, Float)
 computeMove position direction speed dt rankedDirections gameMap moveableCells = (position', direction', elapsedPath)
   where
-    position' :: Vec2
-    position' = (position =+=
-      (getDirVec direction =*- movementCurrentDirection) =+=
-      (getDirVec direction' =*- movementNextDirection) =+= gridSize) =%= gridSize
+    position' :: Point
+    position' = modPos (cellToPoint gridSize) $ position Pt.+
+      (movementCurrentDirection Pt.* getVector direction) Pt.+
+      (movementNextDirection Pt.* getVector direction')
 
     movement :: Float
     movement = speed * dt
@@ -55,17 +56,18 @@ computeMove position direction speed dt rankedDirections gameMap moveableCells =
       | maxMovement - movement <= 0 = fromMaybe direction nextDirection
       | otherwise = direction
 
-    gridSize :: Vec2
-    gridSize = (cellToPoint . fromIntegralVec2 . size) gameMap
+    gridSize :: Point
+    gridSize = (fromIntegralVec2 . size) gameMap
 
     canMove :: Direction -> Bool
     canMove nextDirection' = getGridElement gameMap nextCell `elem` moveableCells
       where
         nextCell :: (Int, Int)
-        nextCell = (roundVec2 . bounds) (pointToCell position =+= getDirVec nextDirection')
-
-        bounds :: Vec2 -> Vec2
-        bounds x = (0, 0) =/\= ((=-- 1) . fromIntegralVec2 . size) gameMap =\/= x
+        nextCell = roundVec2 (modPos gridSize (pointToCell position Pt.+ getVector nextDirection'))
 
     elapsedPath :: Float
     elapsedPath = movementCurrentDirection + movementNextDirection
+
+modPos :: Point -> Point -> Point
+modPos gridSize@(gridWidth, gridHeight) position = case position Pt.+ gridSize of
+  (x, y) -> (x `mod'` gridWidth, y `mod'` gridHeight)

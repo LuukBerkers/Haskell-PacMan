@@ -11,7 +11,7 @@ import PacMan.Class.Updateable
 instance Renderable GameMap where
   render sprite _ GameMap { gameMap } = (pictures . zipWith (uncurry translate) coords) connectWalls
     where
-      coords :: [Vec2]
+      coords :: [Point]
       coords = [(cellToScreen . fromIntegralVec2) (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
       connectWalls :: [Picture]
@@ -53,3 +53,6 @@ instance Renderable GameMap where
 -- coin has no update functions
 -- fall back on default implementation of key down and update
 instance Updateable GameMap where
+
+addToStartAndEnd :: a -> [a] -> [a]
+addToStartAndEnd a list = a : list ++ [a]

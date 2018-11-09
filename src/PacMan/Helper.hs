@@ -3,6 +3,8 @@ module PacMan.Helper where
 import System.Random
 import Data.Fixed
 import Codec.BMP
+import Graphics.Gloss.Data.Point
+import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
 
@@ -13,96 +15,35 @@ tileHeight = 20
 data Direction = North | East | South | West deriving (Show, Eq)
 data Cell = GhostHouse | Empty | Wall | CoinCell | PowerUpCell deriving (Show, Eq)
 
-type Vec2 = (Float, Float)
+getVector :: Direction -> Vector
+getVector North = (0, -1)
+getVector East  = (1,  0)
+getVector South = (0,  1)
+getVector West  = (-1, 0)
 
-infixl 6 =+-
-(=+-) :: Vec2 -> Float -> Vec2
-(=+-) (x1, y1) v = (x1 + v, y1 + v)
-
-infixl 6 =+=
-(=+=) :: Vec2 -> Vec2 -> Vec2
-(=+=) (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
-
-infixl 6 =--
-(=--) :: Vec2 -> Float -> Vec2
-(=--) (x1, y1) v = (x1 - v, y1 - v)
-
-infixl 6 =-=
-(=-=) :: Vec2 -> Vec2 -> Vec2
-(=-=) (x1, y1) (x2, y2) = (x1 - x2, y1 - y2)
-
-infixl 7 =*-
-(=*-) :: Vec2 -> Float -> Vec2
-(=*-) (x1, y1) s = (x1 * s, y1 * s)
-
-infixl 7 =*=
-(=*=) :: Vec2 -> Vec2 -> Vec2
-(=*=) (x1, y1) (x2, y2) = (x1 * x2, y1 * y2)
-
-infixl 7 =/-
-(=/-) :: Vec2 -> Float -> Vec2
-(=/-) (x1, y1) s = (x1 / s, y1 / s)
-
-infixl 7 =/=
-(=/=) :: Vec2 -> Vec2 -> Vec2
-(=/=) (x1, y1) (x2, y2) = (x1 / x2, y1 / y2)
-
-infixl 8 =%-
-(=%-) :: Vec2 -> Float -> Vec2
-(=%-) (x1, y1) s = (x1 `mod'` s, y1 `mod'` s)
-
-infixl 8 =%=
-(=%=) :: Vec2 -> Vec2 -> Vec2
-(=%=) (x1, y1) (x2, y2) = (x1 `mod'` x2, y1 `mod'` y2)
-
-infixl 8 =\/=
-(=\/=) :: Vec2 -> Vec2 -> Vec2
-(=\/=) (x1, y1) (x2, y2) = (x1 `min` x2, y1 `min` y2)
-
-infixl 8 =\/-
-(=\/-) :: Vec2 -> Float -> Vec2
-(=\/-) (x, y) v = (x `min` v, y `min` v)
-
-infixl 8 =/\=
-(=/\=) :: Vec2 -> Vec2 -> Vec2
-(=/\=) (x1, y1) (x2, y2) = (x1 `max` x2, y1 `max` y2)
-
-infixl 8 =/\-
-(=/\-) :: Vec2 -> Float -> Vec2
-(=/\-) (x, y) v = (x `max` v, y `max` v)
-
-getDirVec :: Direction -> Vec2
-getDirVec North = (0, -1)
-getDirVec East = (1, 0)
-getDirVec South = (0, 1)
-getDirVec West = (-1, 0)
-
-pointToScreen :: Vec2 -> Vec2
+pointToScreen :: Point -> Point
 pointToScreen (x, y) = (x - 270, 290 - y)
 
-cellToPoint :: Vec2 -> Vec2
-cellToPoint coord = (fromIntegral tileWidth, fromIntegral tileHeight) =*= coord
+cellToPoint :: Point -> Point
+cellToPoint (x, y) = (fromIntegral tileWidth * x, fromIntegral tileHeight * y)
 
-cellToScreen :: Vec2 -> Vec2
+cellToScreen :: Point -> Point
 cellToScreen = pointToScreen . cellToPoint
 
-pointToCell :: Vec2 -> Vec2
-pointToCell coord = coord =/= (fromIntegral tileWidth, fromIntegral tileHeight)
+pointToCell :: Point -> Point
+pointToCell (x, y) = (x / fromIntegral tileWidth, y / fromIntegral tileHeight)
 
-screenToPoint :: Vec2 -> Vec2
+screenToPoint :: Point -> Point
 screenToPoint (x, y) = (x + 270, 290 - y)
 
-screenToCell :: Vec2 -> Vec2
+screenToCell :: Point -> Point
 screenToCell = pointToCell . screenToPoint
 
-fromIntegralVec2 :: (Int, Int) -> Vec2
+fromIntegralVec2 :: (Int, Int) -> Point
 fromIntegralVec2 (x, y) = (fromIntegral x, fromIntegral y)
 
-roundVec2 :: Vec2 -> (Int, Int)
+roundVec2 :: Point -> (Int, Int)
 roundVec2 (x, y) = (round x, round y)
-
-lengthVec2 :: Vec2 -> Float
-lengthVec2 (x, y) = sqrt (x ** 2 + y ** 2)
 
 size :: [[a]] -> (Int, Int)
 size y@(x:_) = (length x, length y)
@@ -135,11 +76,8 @@ loadBitmapData :: FilePath -> IO BitmapData
 loadBitmapData filePath = do
   ebmp <- readBMP filePath
   case ebmp of
-    Left err -> error $ show err
+    Left err  -> error $ show err
     Right bmp -> return $ bitmapDataOfBMP bmp
-
-addToStartAndEnd :: a -> [a] -> [a]
-addToStartAndEnd a list = a : list ++ [a]
 
 -- shuffles list
 shuffle :: StdGen -> [a] -> ([a], StdGen)
@@ -162,5 +100,5 @@ readGameMap = map (map replace) . lines <$> readFile "data/gameMap.txt"
     replace ' ' = Empty
     replace _   = Empty -- unknown
 
-ghostIsHome :: [[Cell]] -> Vec2 -> Bool
+ghostIsHome :: [[Cell]] -> Point -> Bool
 ghostIsHome gameMap position = getGridElement gameMap (roundVec2 (pointToCell position)) == GhostHouse

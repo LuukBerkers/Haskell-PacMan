@@ -30,7 +30,7 @@ view sprite gameState@MapEditor { grid, coins } = pictures $
     height :: Int
     (width, height) = (size . gameMap) grid
 
-    drawLine :: Vec2 -> Vec2 -> Picture
+    drawLine :: Point -> Point -> Picture
     drawLine (sx, sy) (ex, ey) = (color (greyN 0.4) . line) [cellToScreen (sx - 0.5, sy - 0.5), cellToScreen (ex - 0.5, ey - 0.5)]
 view _ _ = Blank
 

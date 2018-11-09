@@ -5,6 +5,9 @@ module PacMan.GameObject.Ghost where
 import System.Random
 import Data.List
 import Graphics.Gloss.Data.Picture
+import Graphics.Gloss.Data.Point
+import qualified Graphics.Gloss.Data.Point.Arithmetic as Pt
+import Graphics.Gloss.Data.Vector
 import PacMan.Model
 import PacMan.Helper
 import PacMan.Class.Renderable
@@ -101,7 +104,7 @@ instance Moveable Ghost where
         NotFrightened -> speedGhost
         Homing        -> fromIntegral tileWidth * 20
 
-      positionGhost' :: Vec2
+      positionGhost' :: Point
       directionGhost' :: Direction
       (positionGhost', directionGhost', _) = computeMove
         position
@@ -138,9 +141,9 @@ instance Moveable Ghost where
             | otherwise = compare (distanceToDirection a) (distanceToDirection b)
 
           distanceToDirection :: Direction -> Float
-          distanceToDirection direction = lengthVec2 (pointToCell position =+= getDirVec direction =-= targetCell)
+          distanceToDirection direction = magV (pointToCell position Pt.+ getVector direction Pt.- targetCell)
 
-      targetCell :: Vec2
+      targetCell :: Point
       targetCell = case frightenedGhost of
         -- if ghost is inside the home, go to the entrance tile to get out
         NotFrightened | ghostIsHome gameMap position -> entranceGhostHouse
@@ -150,15 +153,15 @@ instance Moveable Ghost where
             -- Blinky directly targets Pac-Man
             Blinky -> pointToCell positionPacMan
             -- Pinky tries to ambush Pac-Man by targeting 4 tiles in front of Pac-Man
-            Pinky  -> pointToCell positionPacMan =+= getDirVec directionPacMan =*- 4
+            Pinky  -> 4 Pt.* pointToCell positionPacMan Pt.+ getVector directionPacMan
             -- Clydes has different behaviour based on his distance to packman
             -- If the distance is larger then 8 tiles he goes back to his scattermode corner
             -- If the distance is less then 8 tiles he directly chases Pac-Man
-            Clyde   | lengthVec2 (pointToCell (position =-= positionPacMan)) > 8
+            Clyde   | magV (pointToCell (position Pt.- positionPacMan)) > 8
                    -> scatterModeTargetCell
             Clyde  -> pointToCell positionPacMan
             -- Inky tries to be to the otherside of Pac-Man compared to Blinky
-            Inky   -> pointToCell $ blinkyPosition =+= ((blinkyPosition =-= positionPacMan) =*- 2)
+            Inky   -> pointToCell (blinkyPosition Pt.+ (2 Pt.* (blinkyPosition Pt.- positionPacMan)))
         -- Ghost is homing, target cell is ghost house
         _ -> centerGhostHouse
         where
@@ -167,10 +170,10 @@ instance Moveable Ghost where
             StepMovement movementMode' _ _ -> movementMode'
             FinalMovement movementMode'    -> movementMode'
 
-          blinkyPosition :: Vec2
+          blinkyPosition :: Point
           blinkyPosition = case ghosts of (blinky, _, _, _) -> positionGhost blinky
 
-          scatterModeTargetCell :: Vec2
+          scatterModeTargetCell :: Point
           scatterModeTargetCell = case behaviourGhost of
             Blinky -> (width, 0)
             Pinky  -> (0, 0)

@@ -5,6 +5,8 @@ module PacMan.Model where
 import Data.Maybe
 import System.Random
 import PacMan.Helper
+import Graphics.Gloss.Data.Point
+import Graphics.Gloss.Data.Vector
 import PacMan.HighscoreHelper
 
 -- Movement modes of Ghosts
@@ -63,7 +65,7 @@ defaultPowerUpDuration :: Float
 
 data PacMan = PacMan {
   elapsedPath :: Float,
-  positionPacMan :: Vec2,
+  positionPacMan :: Point,
   directionPacMan :: Direction,
   nextDirectionPacMan :: Direction,
   speedPacMan :: Float
@@ -76,16 +78,16 @@ data CoinType = Regular | PowerUp
 data Coin = Coin {
   stateCoin :: CoinState,
   typeCoin :: CoinType,
-  positionCoin :: Vec2
+  positionCoin :: Point
 }
 defaultCoins :: [[Cell]] -> [Coin]
 defaultCoins gameMap' = (mapMaybe convert . zip (coords gameMap') . concat) gameMap'
   where
-    coords :: [[Cell]] -> [Vec2]
+    coords :: [[Cell]] -> [Point]
     coords gameMap' = case size gameMap' of
       (width, height) -> [fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
-    convert :: (Vec2, Cell) -> Maybe Coin
+    convert :: (Point, Cell) -> Maybe Coin
     convert (coord, CoinCell)    = Just $ Coin Alive Regular coord
     convert (coord, PowerUpCell) = Just $ Coin Alive PowerUp coord
     convert _                    = Nothing
@@ -98,7 +100,7 @@ data GhostBehaviour = Clyde | Pinky | Inky | Blinky
 data FrightenedMode = Frightened | NotFrightened | Homing
 data SpawnMode = Spawned | NotSpawned
 data Ghost = Ghost {
-  positionGhost :: Vec2,
+  positionGhost :: Point,
   directionGhost :: Direction,
   speedGhost :: Float,
   behaviourGhost :: GhostBehaviour,

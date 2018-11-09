@@ -6,6 +6,7 @@ module PacMan.GameObject.PacMan where
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
 import Graphics.Gloss.Interface.IO.Game
+import Graphics.Gloss.Data.Point
 import PacMan.Model hiding (pacMan)
 import PacMan.Helper
 import PacMan.Class.Renderable
@@ -63,7 +64,7 @@ instance Moveable PacMan where
     elapsedPath = elapsedPath + elapsedPath'
   }
     where
-      positionPacMan' :: Vec2
+      positionPacMan' :: Point
       directionPacMan' :: Direction
       elapsedPath' :: Float
       (positionPacMan', directionPacMan', elapsedPath') = computeMove

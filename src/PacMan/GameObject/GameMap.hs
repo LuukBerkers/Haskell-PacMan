@@ -54,5 +54,6 @@ instance Renderable GameMap where
 -- fall back on default implementation of key down and update
 instance Updateable GameMap where
 
+-- helper functions
 addToStartAndEnd :: a -> [a] -> [a]
 addToStartAndEnd a list = a : list ++ [a]

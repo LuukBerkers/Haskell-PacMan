@@ -4,6 +4,7 @@
 module PacMan.GameObject.Coin where
 
 import Graphics.Gloss.Data.Picture
+import Graphics.Gloss.Data.Bitmap
 import PacMan.Model
 import PacMan.Helper
 import PacMan.Class.Renderable
@@ -11,10 +12,10 @@ import PacMan.Class.Updateable
 
 instance Renderable Coin where
   render _ _ Coin { stateCoin = Eaten } = Blank
-  render sprite MapEditor { }        coin = drawCoin sprite coin 0
   render sprite Game { elapsedTime } coin = drawCoin sprite coin elapsedTime
-  render _ _ _ = Blank
+  render sprite _                    coin = drawCoin sprite coin 0
 
+drawCoin :: BitmapData -> Coin -> Float -> Picture
 drawCoin sprite Coin { positionCoin, typeCoin } elapsedTime = uncurry translate (cellToScreen positionCoin) (spriteSection spritePosition sprite)
   where
     spritePosition :: (Int, Int)

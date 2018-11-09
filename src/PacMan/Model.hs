@@ -81,10 +81,10 @@ data Coin = Coin {
   positionCoin :: Point
 }
 defaultCoins :: [[Cell]] -> [Coin]
-defaultCoins gameMap' = (mapMaybe convert . zip (coords gameMap') . concat) gameMap'
+defaultCoins gameMap' = (mapMaybe convert . zip coords . concat) gameMap'
   where
-    coords :: [[Cell]] -> [Point]
-    coords gameMap' = case size gameMap' of
+    coords :: [Point]
+    coords = case size gameMap' of
       (width, height) -> [fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
 
     convert :: (Point, Cell) -> Maybe Coin

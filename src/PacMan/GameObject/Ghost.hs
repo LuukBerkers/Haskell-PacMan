@@ -5,7 +5,6 @@ module PacMan.GameObject.Ghost where
 import System.Random
 import Data.List
 import Graphics.Gloss.Data.Picture
-import Graphics.Gloss.Data.Point
 import qualified Graphics.Gloss.Data.Point.Arithmetic as Pt
 import Graphics.Gloss.Data.Vector
 import PacMan.Model
@@ -70,7 +69,6 @@ instance Updateable Ghost where
           Clyde -> if score > 1500 then Spawned else NotSpawned
           _     -> Spawned
   update gameState dt ghost = move dt gameState ghost
-  update _ _ ghost = ghost
 
 instance Moveable Ghost where
   move dt Game {
@@ -134,7 +132,7 @@ instance Moveable Ghost where
             | otherwise = compare (distanceToDirection a) (distanceToDirection b)
 
           distanceToDirection :: Direction -> Float
-          distanceToDirection direction = magV (pointToCell position Pt.+ getVector direction Pt.- targetCell)
+          distanceToDirection direction' = magV (pointToCell position Pt.+ getVector direction' Pt.- targetCell)
 
       targetCell :: Point
       targetCell = case frightenedGhost of
@@ -175,3 +173,4 @@ instance Moveable Ghost where
             where
               width, height :: Float
               (width, height) = (fromIntegralVec2 . size) gameMap
+  move _ _ ghost = ghost

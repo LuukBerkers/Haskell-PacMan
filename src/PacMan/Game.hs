@@ -10,6 +10,7 @@ import Graphics.Gloss.Data.Bitmap
 import Graphics.Gloss.Interface.IO.Game
 import PacMan.Model
 import PacMan.Helper
+import PacMan.LevelProgress
 import PacMan.Class.Renderable
 import PacMan.Class.Updateable
 import PacMan.GameObject.Coin()
@@ -171,10 +172,10 @@ updateCoins _ gameState = gameState
 
 updateGhostMovementProgress :: Float -> State -> State
 updateGhostMovementProgress _  gameState@Game { ghostMovementProgress = (FinalMovement _) } = gameState
-updateGhostMovementProgress dt gameState@Game { ghostMovementProgress = (StepMovement mode time next) } = gameState {
+updateGhostMovementProgress dt gameState@Game { ghostMovementProgress = (StepMovement mode time nextStep) } = gameState {
   ghostMovementProgress = if newTime < 0
-    then next
-    else StepMovement mode newTime next
+    then nextStep
+    else StepMovement mode newTime nextStep
 }
   where
     newTime :: Float

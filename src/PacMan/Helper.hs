@@ -1,7 +1,6 @@
 module PacMan.Helper where
 
 import System.Random
-import Data.Fixed
 import Codec.BMP
 import Graphics.Gloss.Data.Point
 import Graphics.Gloss.Data.Vector

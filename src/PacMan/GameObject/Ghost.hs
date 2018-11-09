@@ -97,7 +97,15 @@ instance Updateable Ghost where
         _          -> (sortBy sort' [North, East, South, West], stdGen)
         where
           sort' :: Direction -> Direction -> Ordering
-          sort' a b = compare (distanceToDirection a) (distanceToDirection b)
+          sort' a b
+            -- Rank cells based on closest distance to Pac-Man
+            -- Execept if that direction is the opposite of current direction
+            -- This means that the ghost will always move
+            -- to the cell next to it that is closest to Pac-Man and
+            -- will only turn to the opposite direction if no other choice is possible
+            | a == oppositeDirection (directionGhost ghost) = GT
+            | b == oppositeDirection (directionGhost ghost) = LT
+            | otherwise = compare (distanceToDirection a) (distanceToDirection b)
 
           distanceToDirection :: Direction -> Float
           distanceToDirection direction = lengthVec2 (pointToCell position =+= getDirVec direction =-= targetCell)

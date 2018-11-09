@@ -107,11 +107,7 @@ computeMove position direction speed dt rankedDirections gameMap moveableCells =
     gridSize = (cellToPoint . fromIntegralVec2 . size) gameMap
 
     canMove :: Direction -> Bool
-    canMove nextDirection'
-      -- cannot move into direction
-      | nextDirection' == oppositeDirection direction = False
-      -- can only move if the next cell is one of moveableCells
-      | otherwise = getGridElement gameMap nextCell `elem` moveableCells
+    canMove nextDirection' = getGridElement gameMap nextCell `elem` moveableCells
       where
         nextCell :: (Int, Int)
         nextCell = (roundVec2 . bounds) (pointToCell position =+= getDirVec nextDirection')

@@ -161,3 +161,6 @@ readGameMap = map (map replace) . lines <$> readFile "data/gameMap.txt"
     replace '_' = GhostHouse
     replace ' ' = Empty
     replace _   = Empty -- unknown
+
+ghostIsHome :: [[Cell]] -> Vec2 -> Bool
+ghostIsHome gameMap position = getGridElement gameMap (roundVec2 (pointToCell position)) == GhostHouse

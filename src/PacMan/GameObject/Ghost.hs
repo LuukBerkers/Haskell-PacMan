@@ -2,18 +2,12 @@
 
 module PacMan.GameObject.Ghost where
 
-import System.Random
-import Data.List
 import Graphics.Gloss.Data.Picture
 import PacMan.Model
 import PacMan.Helper
 import PacMan.Class.Renderable
 import PacMan.Class.Updateable
 import PacMan.Class.Moveable
-
-centerGhostHouse, entranceGhostHouse :: (Float, Float)
-centerGhostHouse   = (13.5, 13)
-entranceGhostHouse = (13.5, 10)
 
 instance Renderable Ghost where
   render sprite Game { powerUpTimer } Ghost {
@@ -65,91 +59,24 @@ instance Updateable Ghost where
           Inky  -> if score > 500  then Spawned else NotSpawned
           Clyde -> if score > 1500 then Spawned else NotSpawned
           _     -> Spawned
-  update Game {
-    ghostMovementProgress,
-    pacMan = PacMan { positionPacMan, directionPacMan },
-    grid = GameMap { gameMap },
-    ghosts
+  update gameState@Game {
+    pacMan = PacMan { positionPacMan },
+    grid = GameMap { gameMap }
   } dt ghost@Ghost {
     positionGhost = position,
-    behaviourGhost = behaviour,
-    frightenedGhost,
-    stdGen
+    frightenedGhost
   } = movedGhost {
-    stdGen = stdGen',
     frightenedGhost = frightened
   }
     where
       frightened :: FrightenedMode
       frightened = case frightenedGhost of
-        Homing | ghostIsHome -> NotFrightened
+        Homing | ghostIsHome gameMap position -> NotFrightened
         -- if ghost is frightened and hit Pac-Man, go back to home to respawn
         Frightened | roundVec2 (pointToCell positionPacMan) == roundVec2 (pointToCell position) -> Homing
         _ -> frightenedGhost
 
       movedGhost :: Ghost
-      movedGhost = move dt gameMap rankedDirections ghost
+      movedGhost = move dt gameState ghost
 
-      rankedDirections :: [Direction]
-      stdGen' :: StdGen
-      (rankedDirections, stdGen') = case frightenedGhost of
-        Frightened -> shuffle stdGen [North, East, South, West]
-        _          -> (sortBy sort' [North, East, South, West], stdGen)
-        where
-          sort' :: Direction -> Direction -> Ordering
-          sort' a b
-            -- Rank cells based on closest distance to Pac-Man
-            -- Execept if that direction is the opposite of current direction
-            -- This means that the ghost will always move
-            -- to the cell next to it that is closest to Pac-Man and
-            -- will only turn to the opposite direction if no other choice is possible
-            | a == oppositeDirection (directionGhost ghost) = GT
-            | b == oppositeDirection (directionGhost ghost) = LT
-            | otherwise = compare (distanceToDirection a) (distanceToDirection b)
-
-          distanceToDirection :: Direction -> Float
-          distanceToDirection direction = lengthVec2 (pointToCell position =+= getDirVec direction =-= targetCell)
-
-      ghostIsHome :: Bool
-      ghostIsHome = getGridElement gameMap (roundVec2 (pointToCell position)) == GhostHouse
-
-      targetCell :: Vec2
-      targetCell = case frightenedGhost of
-        -- if ghost is inside the home, go to the entrance tile to get out
-        NotFrightened | ghostIsHome -> entranceGhostHouse
-        NotFrightened -> case movementMode of
-          Scatter -> scatterModeTargetCell
-          Chase -> case behaviour of
-            -- Blinky directly targets Pac-Man
-            Blinky -> pointToCell positionPacMan
-            -- Pinky tries to ambush Pac-Man by targeting 4 tiles in front of Pac-Man
-            Pinky  -> pointToCell positionPacMan =+= getDirVec directionPacMan =*- 4
-            -- Clydes has different behaviour based on his distance to packman
-            -- If the distance is larger then 8 tiles he goes back to his scattermode corner
-            -- If the distance is less then 8 tiles he directly chases Pac-Man
-            Clyde   | lengthVec2 (pointToCell (position =-= positionPacMan)) > 8
-                   -> scatterModeTargetCell
-            Clyde  -> pointToCell positionPacMan
-            -- Inky tries to be to the otherside of Pac-Man compared to Blinky
-            Inky   -> pointToCell $ blinkyPosition =+= ((blinkyPosition =-= positionPacMan) =*- 2)
-        -- Ghost is homing, target cell is ghost house
-        _ -> centerGhostHouse
-        where
-          movementMode :: MovementMode
-          movementMode = case ghostMovementProgress of
-            StepMovement movementMode' _ _ -> movementMode'
-            FinalMovement movementMode'    -> movementMode'
-
-          blinkyPosition :: Vec2
-          blinkyPosition = case ghosts of (blinky, _, _, _) -> positionGhost blinky
-
-          scatterModeTargetCell :: Vec2
-          scatterModeTargetCell = case behaviour of
-            Blinky -> (width, 0)
-            Pinky  -> (0, 0)
-            Inky   -> (width, height)
-            Clyde  -> (0, height)
-            where
-              width, height :: Float
-              (width, height) = (fromIntegralVec2 . size) gameMap
   update _ _ ghost = ghost

@@ -116,7 +116,7 @@ defaultGhosts stdGen = (
 
 -- State of the game
 data GameMode = Playing | Paused
-data MainMenuSelect = MainMenuStart | MainMenuHighscores
+data MainMenuSelect = MainMenuStart | MainMenuHighscores | MainMenuMapEditor
 
 -- Data type to store the actual game state
 data State = Game {

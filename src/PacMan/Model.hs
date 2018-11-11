@@ -1,3 +1,5 @@
+-- Model, store all data objects that form the state
+
 {-# LANGUAGE NamedFieldPuns #-}
 
 module PacMan.Model where
@@ -8,6 +10,7 @@ import PacMan.Helper
 import Graphics.Gloss.Data.Point
 import PacMan.HighscoreHelper
 import PacMan.LevelProgress
+import PacMan.Constants
 
 data PacMan = PacMan {
   elapsedPath :: Float,
@@ -16,8 +19,6 @@ data PacMan = PacMan {
   nextDirectionPacMan :: Direction,
   speedPacMan :: Float
 }
-defaultPacMan :: PacMan
-defaultPacMan = PacMan 0 (cellToPoint (13.5, 22)) North North (8 * fromIntegral tileWidth)
 
 data CoinState = Eaten | Alive deriving (Eq)
 data CoinType = Regular | PowerUp
@@ -26,17 +27,6 @@ data Coin = Coin {
   typeCoin :: CoinType,
   positionCoin :: Point
 }
-defaultCoins :: [[Cell]] -> [Coin]
-defaultCoins gameMap' = (mapMaybe convert . zip coords . concat) gameMap'
-  where
-    coords :: [Point]
-    coords = case size gameMap' of
-      (width, height) -> [fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
-
-    convert :: (Point, Cell) -> Maybe Coin
-    convert (coord, CoinCell)    = Just $ Coin Alive Regular coord
-    convert (coord, PowerUpCell) = Just $ Coin Alive PowerUp coord
-    convert _                    = Nothing
 
 newtype GameMap = GameMap {
   gameMap :: [[Cell]]
@@ -54,13 +44,6 @@ data Ghost = Ghost {
   spawnMode :: SpawnMode,
   stdGen :: StdGen
 }
-defaultGhosts :: StdGen -> (Ghost, Ghost, Ghost, Ghost)
-defaultGhosts stdGen = (
-    Ghost (cellToPoint (13.5, 10)) North (8 * fromIntegral tileWidth) Blinky NotFrightened NotSpawned stdGen,
-    Ghost (cellToPoint (13.5, 13)) North (7 * fromIntegral tileWidth) Pinky  NotFrightened NotSpawned stdGen,
-    Ghost (cellToPoint (11.5, 13)) North (7 * fromIntegral tileWidth) Inky   NotFrightened NotSpawned stdGen,
-    Ghost (cellToPoint (15.5, 13)) North (7 * fromIntegral tileWidth) Clyde  NotFrightened NotSpawned stdGen
-  )
 
 -- State of the game
 data GameMode = Playing | Paused
@@ -95,6 +78,31 @@ data State = Game {
   coins :: [Coin]
 }
 
+-- Some instances are always the same,
+-- create default instances so not all the argumants have to be passed around
+defaultPacMan :: PacMan
+defaultPacMan = PacMan 0 (cellToPoint pacManStartPosition) North North pacManSpeed
+
+defaultCoins :: [[Cell]] -> [Coin]
+defaultCoins gameMap' = (mapMaybe convert . zip coords . concat) gameMap'
+  where
+    coords :: [Point]
+    coords = case size gameMap' of
+      (width, height) -> [fromIntegralVec2 (x, y) | y <- [0 .. height - 1], x <- [0 .. width - 1]]
+
+    convert :: (Point, Cell) -> Maybe Coin
+    convert (coord, CoinCell)    = Just (Coin Alive Regular coord)
+    convert (coord, PowerUpCell) = Just (Coin Alive PowerUp coord)
+    convert _                    = Nothing
+
+defaultGhosts :: StdGen -> (Ghost, Ghost, Ghost, Ghost)
+defaultGhosts stdGen = (
+    Ghost (cellToPoint blinkyStartPosition) North blinkySpeed Blinky NotFrightened NotSpawned stdGen,
+    Ghost (cellToPoint pinkyStartPosition)  North pinkySpeed  Pinky  NotFrightened NotSpawned stdGen,
+    Ghost (cellToPoint inkyStartPosition)   North inkySpeed   Inky   NotFrightened NotSpawned stdGen,
+    Ghost (cellToPoint clydeStartPosition)  North clydeSpeed  Clyde  NotFrightened NotSpawned stdGen
+  )
+
 defaultGame :: StdGen -> [[Cell]] -> State
 defaultGame stdGen gameMap' = Game {
   gameMode = Playing,
@@ -102,7 +110,7 @@ defaultGame stdGen gameMap' = Game {
   powerUpTimer = 0,
   score = 0,
   level = 0,
-  lives = 3,
+  lives = maxLives,
   levelProgress = defaultLevelProgress,
   powerUpDuration = defaultPowerUpDuration,
   ghostMovementProgress = defaultMovementModeProgress,

@@ -6,10 +6,7 @@ import Graphics.Gloss.Data.Point
 import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Data.Picture
 import Graphics.Gloss.Data.Bitmap
-
-tileWidth, tileHeight :: Int
-tileWidth = 20
-tileHeight = 20
+import PacMan.Constants
 
 data Direction = North | East | South | West deriving (Show, Eq)
 data Cell = GhostHouse | Empty | Wall | CoinCell | PowerUpCell deriving (Show, Eq)
@@ -59,8 +56,9 @@ setGridElement :: [[Cell]] -> (Int, Int) -> Cell -> [[Cell]]
 setGridElement ((_ : hs) : vs) (0, 0) e = (e : hs) : vs
 setGridElement ((h : hs) : vs) (x, 0) e = case setGridElement [hs] (x - 1, 0) e of
   (v':_) -> (h:v'):vs
+  []     -> [h]:vs
 setGridElement (v        : vs) (x, y) e = v : setGridElement vs (x, y - 1) e
-setGridElement _               _      _ = error "could not find index"
+setGridElement grid            _      _ = grid
 
 -- made my loadfunction because I want to use BitmapData instead of Picture
 loadBitmapData :: FilePath -> IO BitmapData

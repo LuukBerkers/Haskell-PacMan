@@ -1,3 +1,16 @@
+-- Logic for entering you high score,
+-- Screen looks as follows
+-- ---------------------------
+-- |       YOUR SCORE WAS    |
+-- |         xxxxxxxx        |
+-- |                         |
+-- |        A   A   A        |
+-- |                         |
+-- |                         |
+-- | PRESS ENTER TO CONTINUE |
+-- |                         |
+-- ---------------------------
+
 {-# LANGUAGE NamedFieldPuns #-}
 
 module PacMan.EnterHighscore where

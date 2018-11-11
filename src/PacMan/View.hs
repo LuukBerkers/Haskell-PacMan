@@ -1,3 +1,5 @@
+-- View logic, calls the view function depending on the game state
+
 {-# LANGUAGE NamedFieldPuns #-}
 
 module PacMan.View where

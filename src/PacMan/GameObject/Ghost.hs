@@ -13,6 +13,7 @@ import PacMan.Class.Renderable
 import PacMan.Class.Updateable
 import PacMan.Class.Moveable
 import PacMan.LevelProgress
+import PacMan.Constants
 
 -- Move to constants file
 centerGhostHouse, entranceGhostHouse :: (Float, Float)
@@ -55,7 +56,7 @@ instance Renderable Ghost where
         where
           -- blink if powerup timer is less then 2 seconds
           blink :: Bool
-          blink = powerUpTimer < 2 && round (powerUpTimer * 5) `mod` 2 == 0
+          blink = powerUpTimer < 2 && round (powerUpTimer * 5) `mod` (2 :: Int) == 0
 
   render _ _ _ = Blank
 
@@ -70,6 +71,8 @@ instance Updateable Ghost where
           Clyde -> if score > 1500 then Spawned else NotSpawned
           _     -> Spawned
   update gameState dt ghost = move gameState dt ghost
+
+  event _ _ a = a
 
 instance Moveable Ghost where
   move Game {
@@ -92,9 +95,9 @@ instance Moveable Ghost where
     where
       speed :: Float
       speed = case frightenedGhost of
-        Frightened    -> fromIntegral tileWidth
+        Frightened    -> frightenedGhostSpeed
         NotFrightened -> speedGhost
-        Homing        -> fromIntegral tileWidth * 20
+        Homing        -> homingGhostSpeed
 
       positionGhost' :: Point
       directionGhost' :: Direction

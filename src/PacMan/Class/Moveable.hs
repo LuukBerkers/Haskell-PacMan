@@ -9,10 +9,12 @@ import qualified Graphics.Gloss.Data.Point.Arithmetic as Pt
 import Graphics.Gloss.Data.Point
 import PacMan.Helper
 import PacMan.Model
+import PacMan.Constants
 
 class Moveable a where
   move :: State -> Float -> a -> a
 
+-- general moving logic that can be used by both ghost and pacman
 computeMove :: Point -> Direction -> Float -> Float -> [Direction] -> [[Cell]] -> [Cell] -> (Point, Direction, Float)
 computeMove position direction speed dt rankedDirections gameMap moveableCells = (position', direction', elapsedPath)
   where
@@ -22,7 +24,7 @@ computeMove position direction speed dt rankedDirections gameMap moveableCells =
       (movementNextDirection Pt.* getVector direction')
 
     movement :: Float
-    movement = speed * dt
+    movement = speed * dt * fromIntegral tileWidth
 
     maxMovement :: Float
     maxMovement = case direction of

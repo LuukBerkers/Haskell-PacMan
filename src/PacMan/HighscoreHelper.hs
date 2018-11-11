@@ -19,12 +19,10 @@ instance Ord Score where
   (Score _ a) <= (Score _ b)        = b <= a
   (Score _ a) > (Score _ b)         = b > a
   (Score _ a) >= (Score _ b)        = b >= a
-  -- max (Score _ a) (Score _ b)       = max a b
-  -- min (Score _ a) (Score _ b)       = min a b
 
 -- Read and write scores with JSON format
 instance FromJSON Score where
-  parseJSON = withObject "Score" $ \v -> Score <$> v .: "name" <*> v .: "score"
+  parseJSON = withObject "Score" (\v -> Score <$> v .: "name" <*> v .: "score")
 
 instance ToJSON Score where
   toJSON (Score name score)     = object ["name" .= name, "score" .= score]

@@ -4,6 +4,7 @@ import Graphics.Gloss.Interface.IO.Game
 import PacMan.Controller
 import PacMan.Model
 import PacMan.View
+import PacMan.Constants
 import PacMan.Helper
 
 main :: IO ()

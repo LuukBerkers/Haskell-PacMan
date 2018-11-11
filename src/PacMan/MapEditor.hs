@@ -1,3 +1,6 @@
+-- Screen that lets users generate custom levels
+-- The regular game map is shown, clickin on a cell changes said cell
+
 {-# LANGUAGE NamedFieldPuns #-}
 
 module PacMan.MapEditor where
@@ -14,7 +17,7 @@ import PacMan.GameObject.GameMap()
 import PacMan.GameObject.Coin()
 
 view :: BitmapData -> State -> Picture
-view sprite gameState@MapEditor { grid, coins } = pictures $
+view sprite gameState@MapEditor { grid = grid@GameMap { gameMap }, coins } = pictures $
   render' grid :
   (translate (-260) 320    . scale 0.2 0.2 . color white . Text) "Click on any cell to change it" :
   (translate (-260) (-340) . scale 0.2 0.2 . color white . Text) "Press RETURN to play" :
@@ -28,7 +31,7 @@ view sprite gameState@MapEditor { grid, coins } = pictures $
 
     width :: Int
     height :: Int
-    (width, height) = (size . gameMap) grid
+    (width, height) = size gameMap
 
     drawLine :: Point -> Point -> Picture
     drawLine (sx, sy) (ex, ey) = (color (greyN 0.4) . line) [cellToScreen (sx - 0.5, sy - 0.5), cellToScreen (ex - 0.5, ey - 0.5)]
@@ -54,7 +57,7 @@ input (EventKey (MouseButton LeftButton) Down _ mousePosition) gameState@MapEdit
       Wall        -> Empty
       Empty       -> PowerUpCell
       PowerUpCell -> CoinCell
-      GhostHouse  -> GhostHouse
+      GhostHouse  -> GhostHouse -- cannot replace ghost house
 
     gameMap' :: [[Cell]]
     gameMap' = setGridElement gameMap cellPosition replaceCell

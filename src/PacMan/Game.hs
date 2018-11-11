@@ -61,12 +61,12 @@ step dt gameState@Game {
 }
   -- If all coins are eaten, advance to next level
   | all coinIsEaten coins = do
-    stdGen   <- newStdGen
+    stdGen <- newStdGen
     return gameState {
       levelProgress = nextLevelProgress,                -- update level progress
       ghostMovementProgress = nextMovementModeProgress, -- update movement mode progress
       powerUpDuration = nextPowerUpDuration,            -- update power up duration
-      level = level,                                    -- increase level
+      level = level + 1,                                -- increase level
       elapsedTime = 0,                                  -- reset elapsed time
       powerUpTimer = 0,                                 -- reset power up timer
       pacMan = defaultPacMan,                           -- reset Pac-Man
@@ -227,19 +227,19 @@ input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@Game { gameMode = Playin
 input (EventKey (SpecialKey KeyEsc) Down _ _) gameState@Game { gameMode = Paused } = return gameState { gameMode = Playing }
 
 -- emit special keys to all game objects
-input (EventKey (SpecialKey key) Down _ _) gameState@Game {
+input key gameState@Game {
   gameMode = Playing,
   coins,
   pacMan,
   ghosts = (blinky, pinky, inky, clyde),
   grid
 } = return gameState {
-  coins = map keyDown' coins,
-  pacMan = keyDown' pacMan,
-  ghosts = (keyDown' blinky, keyDown' pinky, keyDown' inky, keyDown' clyde),
-  grid = keyDown' grid
+  coins = map event' coins,
+  pacMan = event' pacMan,
+  ghosts = (event' blinky, event' pinky, event' inky, event' clyde),
+  grid = event' grid
 }
   where
-    keyDown' :: Updateable a => a -> a
-    keyDown' = keyDown gameState key
+    event' :: Updateable a => a -> a
+    event' = event gameState key
 input _ gameState = return gameState

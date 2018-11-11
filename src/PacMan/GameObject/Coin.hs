@@ -29,3 +29,5 @@ drawCoin sprite Coin { positionCoin, typeCoin } elapsedTime = uncurry translate 
 -- coin has no update functions
 -- fall back on default implementation of key down and update
 instance Updateable Coin where
+  event _ _ a  = a
+  update _ _ a = a

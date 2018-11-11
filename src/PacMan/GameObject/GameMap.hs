@@ -53,6 +53,9 @@ instance Renderable GameMap where
 -- coin has no update functions
 -- fall back on default implementation of key down and update
 instance Updateable GameMap where
+  event _ _  a = a
+  update _ _ a = a
+
 
 -- helper functions
 addToStartAndEnd :: a -> [a] -> [a]
